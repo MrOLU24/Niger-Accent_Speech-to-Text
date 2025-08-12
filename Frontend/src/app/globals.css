@@ -155,6 +155,25 @@ body {
   animation: glow 2s ease-in-out infinite;
 }
 
+/* Swiper customizations */
+.testimonials-swiper .swiper-pagination {
+  position: relative !important;
+  margin-top: 2rem;
+}
+
+.testimonials-swiper .swiper-pagination-bullet {
+  width: 12px !important;
+  height: 12px !important;
+  margin: 0 6px !important;
+  border-radius: 50% !important;
+  opacity: 1 !important;
+  transition: all 0.3s ease !important;
+}
+
+.testimonials-swiper .swiper-pagination-bullet-active {
+  transform: scale(1.2) !important;
+}
+
 /* Glass morphism effect */
 .glass {
   background: color-mix(in oklab, white 10%, transparent);
