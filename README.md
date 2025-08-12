@@ -1,11 +1,11 @@
-# Nigerian English & Pidgin Speech-to-Text
+# ToriType - Nigerian English & Pidgin Speech-to-Text
 
 An inclusive and highly accurate speech-to-text platform specifically designed for Nigerian English and Pidgin speakers.
 
 ## 🎯 The Problem
-Standard speech-to-text models often struggle with Nigerian accents and Pidgin, leading to poor transcription quality for millions of speakers. Our solution addresses this gap with culturally-aware AI.
+Standard speech-to-text models often struggle with Nigerian accents and Pidgin, leading to poor transcription quality for millions of speakers. ToriType addresses this gap with culturally-aware AI.
 
-## 💡 The Solution
+## 💡 ToriType's Solution
 A machine learning platform that accurately transcribes Nigerian English and Pidgin without attempting to "correct" accents. Users can upload audio files or record directly through their browser for real-time transcription.
 
 ## 🏗️ Project Structure
