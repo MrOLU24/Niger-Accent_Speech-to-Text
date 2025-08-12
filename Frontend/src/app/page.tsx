@@ -79,13 +79,6 @@ export default function LandingPage() {
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
             {/* Left: Content */}
             <div className="text-center lg:text-left">
-              <ScrollReveal>
-                <div className="inline-flex items-center gap-2 rounded-full border border-border bg-accent/30 px-4 py-2 text-sm text-foreground mb-6">
-                  <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></div>
-                  50,000+ Nigerians trust us
-                </div>
-              </ScrollReveal>
-              
               <ScrollReveal y={30} delay={0.1}>
                 <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight leading-[1.1] mb-6">
                   This is not just
@@ -94,13 +87,6 @@ export default function LandingPage() {
                   </span>
                   it's evolution.
                 </h1>
-              </ScrollReveal>
-              
-              <ScrollReveal y={30} delay={0.2}>
-                <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto lg:mx-0 mb-8">
-                  Breakthrough AI technology that understands Nigerian English and Pidgin with unprecedented accuracy. 
-                  Transform your voice content with studio-grade transcription.
-                </p>
               </ScrollReveal>
               
               <ScrollReveal y={30} delay={0.3}>
@@ -123,7 +109,6 @@ export default function LandingPage() {
                     { icon: Mic, text: "Real-time" },
                     { icon: Globe, text: "Nigerian accents" },
                     { icon: Zap, text: "99% accuracy" },
-                    { icon: Users, text: "Team ready" },
                   ].map((tag, i) => (
                     <div key={i} className="inline-flex items-center gap-2 rounded-full border border-border bg-card/60 px-4 py-2 text-muted-foreground backdrop-blur-sm">
                       <tag.icon className="w-4 h-4" />
@@ -367,7 +352,7 @@ export default function LandingPage() {
                 name: "Adebayo Johnson",
                 role: "Podcast Host & Content Creator",
                 content: "ToriType revolutionized my workflow. It perfectly captures my Lagos accent and even understands when I switch to Pidgin mid-conversation. The accuracy is incredible!",
-                avatar: "AJ",
+                avatar: "adebayo",
                 rating: 5,
                 gradient: "from-purple-500 to-blue-500"
               },
@@ -375,7 +360,7 @@ export default function LandingPage() {
                 name: "Fatima Ibrahim",
                 role: "Journalist, Premium Times",
                 content: "As a journalist covering diverse communities, I need transcription that understands context. ToriType's cultural intelligence is unmatched—it gets the nuances that others miss.",
-                avatar: "FI",
+                avatar: "fatima",
                 rating: 5,
                 gradient: "from-blue-500 to-emerald-500"
               },
@@ -383,7 +368,7 @@ export default function LandingPage() {
                 name: "Chinedu Okafor",
                 role: "YouTube Creator, 2M+ subscribers",
                 content: "From interviews to vlogs, ToriType handles everything. The real-time transcription during live streams is a game-changer. My audience loves the instant captions!",
-                avatar: "CO",
+                avatar: "chinedu",
                 rating: 5,
                 gradient: "from-emerald-500 to-purple-500"
               },
@@ -397,8 +382,27 @@ export default function LandingPage() {
                   </div>
                   <p className="text-muted-foreground mb-6 leading-relaxed">"{testimonial.content}"</p>
                   <div className="flex items-center gap-4">
-                    <div className={`w-12 h-12 rounded-full bg-gradient-to-r ${testimonial.gradient} flex items-center justify-center text-white font-bold text-lg`}>
-                      {testimonial.avatar}
+                    <div className="relative w-12 h-12">
+                      <img 
+                        src={`https://tapback.co/api/avatar/${testimonial.avatar}.webp`}
+                        alt={`${testimonial.name} avatar`}
+                        className="w-12 h-12 rounded-full object-cover"
+                        onError={(e) => {
+                          // Fallback to gradient avatar if image fails to load
+                          const target = e.currentTarget as HTMLImageElement;
+                          const fallback = target.nextElementSibling as HTMLElement | null;
+                          target.style.display = 'none';
+                          if (fallback) {
+                            fallback.style.display = 'flex';
+                          }
+                        }}
+                      />
+                      <div 
+                        className={`absolute inset-0 w-12 h-12 rounded-full bg-gradient-to-r ${testimonial.gradient} items-center justify-center text-white font-bold text-lg`}
+                        style={{ display: 'none' }}
+                      >
+                        {testimonial.name.split(' ').map(n => n[0]).join('')}
+                      </div>
                     </div>
                     <div>
                       <div className="font-semibold text-foreground">{testimonial.name}</div>
