@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import Image from "next/image";
 import { useGsap } from "../hooks/useGsap";
 import ScrollReveal from "../components/ScrollReveal";
-import { Mic, Zap, Globe, Users, Star, ArrowRight, Play, Headphones, MessageSquare, BarChart3, Download, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Mic, Zap, Globe, Users, Star, ArrowRight, Play, Headphones, MessageSquare, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination, Autoplay } from 'swiper/modules';
 import 'swiper/css';
@@ -15,42 +16,11 @@ export default function LandingPage() {
 
   // Parallax and hero animations
   const heroRef = useRef<HTMLDivElement>(null);
-  const cardsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!heroRef.current || !gsap || !ScrollTrigger) return;
     
     const ctx = gsap.context(() => {
-      // Rotating gradient ring
-      gsap.fromTo(
-        ".glow-ring",
-        { rotate: 0 },
-        { rotate: 360, repeat: -1, ease: "none", duration: 40 }
-      );
-
-      // Enhanced parallax effects with multiple layers
-      gsap.to(".parallax-up", {
-        yPercent: -25,
-        ease: "none",
-        scrollTrigger: { 
-          trigger: heroRef.current, 
-          start: "top bottom", 
-          end: "bottom top", 
-          scrub: 1.5 
-        },
-      });
-      
-      gsap.to(".parallax-down", {
-        yPercent: 25,
-        ease: "none",
-        scrollTrigger: { 
-          trigger: heroRef.current, 
-          start: "top bottom", 
-          end: "bottom top", 
-          scrub: 1.2 
-        },
-      });
-
       // Floating animation for cards
       gsap.to(".float-card", {
         y: -10,
@@ -70,13 +40,26 @@ export default function LandingPage() {
         yoyo: true,
         repeat: -1
       });
+
+      // Simple reveal animations without locomotive dependencies
+      gsap.from(".reveal", {
+        y: 50,
+        opacity: 0,
+        duration: 1,
+        ease: "power2.out",
+        stagger: 0.1,
+        scrollTrigger: {
+          trigger: ".reveal",
+          start: "top 80%",
+        }
+      });
     }, heroRef);
     
     return () => ctx.revert();
   }, [gsap, ScrollTrigger]);
 
   return (
-  <div className="min-h-screen text-foreground bg-background transition-colors duration-500">
+    <div className="min-h-screen text-foreground bg-background transition-colors duration-500">
       
       {/* Hero Section */}
       <section id="hero" ref={heroRef} className="pt-20 lg:pt-32 pb-16 lg:pb-24 overflow-hidden">
@@ -90,7 +73,7 @@ export default function LandingPage() {
                   <span className="block bg-gradient-to-r from-purple-600 via-blue-600 to-emerald-600 bg-clip-text text-transparent">
                     technology —
                   </span>
-                  it's evolution.
+                  it&apos;s evolution.
                 </h1>
               </ScrollReveal>
               
@@ -115,7 +98,7 @@ export default function LandingPage() {
                     { icon: Globe, text: "Nigerian accents" },
                     { icon: Zap, text: "99% accuracy" },
                   ].map((tag, i) => (
-                    <div key={i} className="inline-flex items-center gap-2 rounded-full border border-border bg-card/60 px-4 py-2 text-muted-foreground backdrop-blur-sm">
+                    <div key={i} className="inline-flex items-center gap-2 px-4 py-2 text-muted-foreground">
                       <tag.icon className="w-4 h-4" />
                       {tag.text}
                     </div>
@@ -125,41 +108,95 @@ export default function LandingPage() {
             </div>
 
             {/* Right: Hero visual */}
-            <div className="relative">
-              <div className="absolute -inset-8 rounded-[2rem] bg-gradient-to-tr from-purple-600/20 via-blue-600/20 to-emerald-600/20 blur-3xl parallax-down hero-glow" />
-              <div className="relative float-card">
-                <div className="rounded-[2rem] border border-border bg-card/80 backdrop-blur-xl overflow-hidden shadow-2xl">
-                  <div className="absolute -right-12 -top-12 h-48 w-48 rounded-full border border-purple-200/50 dark:border-purple-700/50 bg-purple-100/30 dark:bg-purple-900/30 glow-ring" />
-                  <div className="aspect-[4/3] w-full bg-gradient-to-br from-purple-100 to-blue-100 dark:from-purple-900/50 dark:to-blue-900/50 flex items-center justify-center">
+            <div className="relative text-center">
+              {/* Main Visual - No Container */}
+              <div className="relative mb-12">
+                <div className="absolute -inset-8 bg-gradient-to-tr from-purple-600/20 via-blue-600/20 to-emerald-600/20 blur-3xl parallax-down hero-glow" />
+                <div className="relative float-card">
+                  <div className="flex items-center justify-center">
                     <div className="relative">
-                      <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full blur-xl opacity-20"></div>
-                      <Headphones className="w-24 h-24 text-purple-600 dark:text-purple-400 relative z-10" />
+                      <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl blur-2xl opacity-30 animate-pulse"></div>
+                      <Image 
+                        src="/visual.png" 
+                        alt="ToriType AI Voice Recognition Interface"
+                        width={320}
+                        height={320}
+                        className="w-80 h-80 object-contain relative z-10 drop-shadow-2xl"
+                      />
                     </div>
                   </div>
-                  <div className="p-6">
-                    <h3 className="text-xl font-semibold mb-2 text-foreground">AI Voice Recognition</h3>
-                    <p className="text-muted-foreground text-sm">Powered by advanced neural networks trained specifically on Nigerian speech patterns</p>
-                  </div>
                 </div>
+              </div>
 
-                {/* Mini feature cards */}
-                <div ref={cardsRef} className="mt-6 grid grid-cols-3 gap-4 parallax-up">
-                  {[
-                    { title: "Create", subtitle: "AI transcription", gradient: "from-purple-500 to-blue-500", icon: Mic },
-                    { title: "Analyze", subtitle: "Speech insights", gradient: "from-blue-500 to-emerald-500", icon: BarChart3 },
-                    { title: "Export", subtitle: "Multiple formats", gradient: "from-emerald-500 to-purple-500", icon: Download },
-                  ].map((card, i) => (
-                    <ScrollReveal key={i} y={20} delay={0.5 + i * 0.1}>
-                      <div className="float-card rounded-2xl border border-border bg-card/80 p-4 backdrop-blur-xl shadow-lg hover:scale-105 transition-all duration-300 group">
-                        <div className={`h-20 rounded-xl bg-gradient-to-r ${card.gradient} flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300`}>
-                          <card.icon className="w-8 h-8 text-white" />
+              {/* Feature Details - Under the Image */}
+              <div className="space-y-6">
+                <ScrollReveal y={20} delay={0.5}>
+                  <div className="text-center">
+                    <div className="flex items-center justify-center space-x-4 mb-3">
+                      <div className="relative">
+                        <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center shadow-lg">
+                          <div className="w-3 h-3 bg-white rounded-full animate-pulse"></div>
                         </div>
-                        <div className="text-sm font-semibold text-foreground">{card.title}</div>
-                        <div className="text-xs text-muted-foreground">{card.subtitle}</div>
+                        <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full animate-ping opacity-20"></div>
                       </div>
-                    </ScrollReveal>
-                  ))}
-                </div>
+                      <div>
+                        <h4 className="font-semibold text-foreground text-lg">Real-time Processing</h4>
+                        <p className="text-sm text-muted-foreground">Instant transcription</p>
+                      </div>
+                    </div>
+                  </div>
+                </ScrollReveal>
+
+                <ScrollReveal y={20} delay={0.6}>
+                  <div className="text-center">
+                    <div className="flex items-center justify-center space-x-4 mb-3">
+                      <div className="relative">
+                        <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-emerald-500 rounded-full flex items-center justify-center shadow-lg">
+                          <div className="w-3 h-3 bg-white rounded-full animate-pulse"></div>
+                        </div>
+                        <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-emerald-500 rounded-full animate-ping opacity-20"></div>
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-foreground text-lg">Nigerian Accents</h4>
+                        <p className="text-sm text-muted-foreground">Cultural intelligence</p>
+                      </div>
+                    </div>
+                  </div>
+                </ScrollReveal>
+
+                <ScrollReveal y={20} delay={0.7}>
+                  <div className="text-center">
+                    <div className="flex items-center justify-center space-x-4 mb-3">
+                      <div className="relative">
+                        <div className="w-12 h-12 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full flex items-center justify-center shadow-lg">
+                          <div className="w-3 h-3 bg-white rounded-full animate-pulse"></div>
+                        </div>
+                        <div className="absolute inset-0 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full animate-ping opacity-20"></div>
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-foreground text-lg">Pidgin Support</h4>
+                        <p className="text-sm text-muted-foreground">Native understanding</p>
+                      </div>
+                    </div>
+                  </div>
+                </ScrollReveal>
+
+                <ScrollReveal y={20} delay={0.8}>
+                  <div className="text-center">
+                    <div className="flex items-center justify-center space-x-4">
+                      <div className="relative">
+                        <div className="w-12 h-12 bg-gradient-to-r from-teal-500 to-purple-500 rounded-full flex items-center justify-center shadow-lg">
+                          <div className="w-3 h-3 bg-white rounded-full animate-pulse"></div>
+                        </div>
+                        <div className="absolute inset-0 bg-gradient-to-r from-teal-500 to-purple-500 rounded-full animate-ping opacity-20"></div>
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-foreground text-lg">99% Accuracy</h4>
+                        <p className="text-sm text-muted-foreground">Studio-grade quality</p>
+                      </div>
+                    </div>
+                  </div>
+                </ScrollReveal>
               </div>
             </div>
           </div>
@@ -177,7 +214,7 @@ export default function LandingPage() {
               { number: "10M+", label: "Hours processed", sublabel: "This month" },
             ].map((stat, i) => (
               <ScrollReveal key={i} y={20} delay={i * 0.1}>
-                <div className="text-center rounded-2xl border border-border bg-card/80 p-6 lg:p-8 backdrop-blur-sm shadow-lg">
+                <div className="text-center p-6 lg:p-8">
                   <div className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent mb-2">
                     {stat.number}
                   </div>
@@ -203,7 +240,7 @@ export default function LandingPage() {
             <ScrollReveal y={20} delay={0.1}>
               <p className="text-lg lg:text-xl text-muted-foreground max-w-3xl mx-auto">
                 We understand the unique linguistic patterns, cultural context, and speech nuances that make Nigerian communication special. 
-                Our AI doesn't just hear words—it understands meaning.
+                Our AI doesn&apos;t just hear words—it understands meaning.
               </p>
             </ScrollReveal>
           </div>
@@ -245,22 +282,19 @@ export default function LandingPage() {
 
             <ScrollReveal x={30}>
               <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-r from-purple-600/20 to-blue-600/20 rounded-2xl blur-xl"></div>
-                <div className="relative rounded-2xl border border-border bg-card/80 p-8 backdrop-blur-sm">
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-3 text-emerald-600 dark:text-emerald-400">
-                      <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
-                      <span className="text-sm font-medium">Live transcription active</span>
-                    </div>
-                    <div className="space-y-3 text-muted-foreground">
-                      <p className="border-l-4 border-purple-500 pl-4">"Wetin dey happen for this Lagos traffic?"</p>
-                      <p className="border-l-4 border-blue-500 pl-4">"The meeting go start by 3 o'clock."</p>
-                      <p className="border-l-4 border-emerald-500 pl-4">"Make we discuss the project details."</p>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Headphones className="w-4 h-4" />
-                      <span>Accuracy: 99.2% • Response: 50ms</span>
-                    </div>
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3 text-emerald-600 dark:text-emerald-400">
+                    <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
+                    <span className="text-sm font-medium">Live transcription active</span>
+                  </div>
+                  <div className="space-y-3 text-muted-foreground">
+                    <p className="border-l-4 border-purple-500 pl-4">&ldquo;Wetin dey happen for this Lagos traffic?&rdquo;</p>
+                    <p className="border-l-4 border-blue-500 pl-4">&ldquo;The meeting go start by 3 o&apos;clock.&rdquo;</p>
+                    <p className="border-l-4 border-emerald-500 pl-4">&ldquo;Make we discuss the project details.&rdquo;</p>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Headphones className="w-4 h-4" />
+                    <span>Accuracy: 99.2% • Response: 50ms</span>
                   </div>
                 </div>
               </div>
@@ -326,7 +360,7 @@ export default function LandingPage() {
               },
             ].map((feature, i) => (
               <ScrollReveal key={i} y={30} delay={i * 0.1}>
-                <div className="group rounded-2xl border border-border bg-card/80 p-8 backdrop-blur-sm hover:bg-card transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl">
+                <div className="group p-8 transition-all duration-300 hover:scale-105">
                   <div className={`w-16 h-16 rounded-2xl bg-gradient-to-r ${feature.gradient} flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}>
                     <feature.icon className="w-8 h-8 text-white" />
                   </div>
@@ -410,7 +444,7 @@ export default function LandingPage() {
                 {
                   name: "Amina Hassan",
                   role: "Radio Host, Arewa FM",
-                  content: "Finally, an AI that understands Hausa-English code-switching! ToriType has transformed how I prepare show notes and transcripts. It's like having a multilingual assistant.",
+                  content: "Finally, an AI that understands Hausa-English code-switching! ToriType has transformed how I prepare show notes and transcripts. It&apos;s like having a multilingual assistant.",
                   avatar: "amina",
                   rating: 5,
                   gradient: "from-pink-500 to-purple-500"
@@ -418,7 +452,7 @@ export default function LandingPage() {
                 {
                   name: "Kemi Adeleke",
                   role: "Documentary Filmmaker",
-                  content: "Interviewing elders in rural communities, their stories are precious. ToriType captures every word, every pause, every emotion. It's preserving our heritage digitally.",
+                  content: "Interviewing elders in rural communities, their stories are precious. ToriType captures every word, every pause, every emotion. It&apos;s preserving our heritage digitally.",
                   avatar: "kemi",
                   rating: 5,
                   gradient: "from-orange-500 to-pink-500"
@@ -450,19 +484,22 @@ export default function LandingPage() {
               ].map((testimonial, i) => (
                 <SwiperSlide key={i}>
                   <ScrollReveal y={30} delay={0.1}>
-                    <div className="h-full rounded-2xl border border-border bg-card/80 p-8 backdrop-blur-sm shadow-lg">
+                    <div className="h-full p-8">
                       <div className="flex items-center gap-1 mb-4">
                         {[...Array(testimonial.rating)].map((_, i) => (
                           <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />
                         ))}
                       </div>
-                      <p className="text-muted-foreground mb-6 leading-relaxed">"{testimonial.content}"</p>
+                      <p className="text-muted-foreground mb-6 leading-relaxed">&ldquo;{testimonial.content}&rdquo;</p>
                       <div className="flex items-center gap-4">
                         <div className="relative w-12 h-12">
-                          <img 
+                          <Image 
                             src={`https://tapback.co/api/avatar/${testimonial.avatar}.webp`}
                             alt={`${testimonial.name} avatar`}
+                            width={48}
+                            height={48}
                             className="w-12 h-12 rounded-full object-cover"
+                            unoptimized
                             onError={(e) => {
                               // Fallback to gradient avatar if image fails to load
                               const target = e.currentTarget as HTMLImageElement;
@@ -506,7 +543,7 @@ export default function LandingPage() {
       <section className="py-16 lg:py-24">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <ScrollReveal>
-            <div className="relative rounded-3xl border border-gray-200 dark:border-gray-700 bg-gradient-to-r from-purple-600/10 via-blue-600/10 to-emerald-600/10 p-8 lg:p-16 text-center backdrop-blur-sm overflow-hidden">
+            <div className="relative bg-gradient-to-r from-purple-600/10 via-blue-600/10 to-emerald-600/10 p-8 lg:p-16 text-center overflow-hidden">
               <div className="absolute inset-0 bg-gradient-to-r from-purple-600/5 via-blue-600/5 to-emerald-600/5 blur-3xl"></div>
               <div className="relative">
                 <h3 className="text-3xl lg:text-5xl font-bold text-foreground mb-6">
@@ -520,7 +557,7 @@ export default function LandingPage() {
                     <Play className="w-5 h-5" />
                     Start free trial
                   </button>
-                  <button className="inline-flex items-center gap-2 rounded-full border border-border bg-card/80 px-8 py-4 font-semibold text-foreground backdrop-blur-sm hover:bg-card transition-all duration-200">
+                  <button className="inline-flex items-center gap-2 px-8 py-4 font-semibold text-foreground transition-all duration-200">
                     See how it works
                     <ArrowRight className="w-5 h-5" />
                   </button>
