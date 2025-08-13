@@ -44,7 +44,7 @@ export default function Navbar() {
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
     if (element) {
-      const navHeight = 80;
+      const navHeight = window.innerWidth < 768 ? 70 : 80; // Smaller offset for mobile
       const offsetTop = element.offsetTop - navHeight;
       window.scrollTo({
         top: offsetTop,
@@ -60,35 +60,35 @@ export default function Navbar() {
   ];
 
   return (
-  <nav className="fixed top-0 w-full z-50 bg-background/90 backdrop-blur-xl border-b border-border/20 transition-all duration-300">
+  <nav className="fixed top-0 w-full z-50 bg-background/95 backdrop-blur-xl border-b border-border/30 transition-all duration-300 hover:bg-background/98">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16 lg:h-20">
+        <div className="flex justify-between items-center h-14 md:h-16 lg:h-20">
           {/* Logo */}
           <button 
             onClick={() => scrollToSection('hero')}
-            className="flex items-center space-x-3 group"
+            className="flex items-center space-x-2 md:space-x-3 group transition-all duration-300 hover:scale-105"
           >
-            <div className="w-8 h-8 lg:w-10 lg:h-10 bg-gradient-to-r from-purple-500 to-blue-500 rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform">
-              <Mic className="w-4 h-4 lg:w-5 lg:h-5 text-white" />
+            <div className="w-6 h-6 md:w-8 md:h-8 lg:w-10 lg:h-10 bg-gradient-to-r from-purple-500 to-blue-500 rounded-xl flex items-center justify-center group-hover:scale-105 group-hover:rotate-3 transition-all duration-300">
+              <Mic className="w-3 h-3 md:w-4 md:h-4 lg:w-5 lg:h-5 text-white" />
             </div>
-            <span className="text-xl lg:text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
+            <span className="text-lg md:text-xl lg:text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
               ToriType
             </span>
           </button>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
+          <div className="hidden md:flex items-center space-x-6 lg:space-x-8">
             {navItems.map((item) => (
               <button
                 key={item.id}
                 onClick={() => scrollToSection(item.id)}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+                className={`group px-3 md:px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 hover:scale-105 ${
                   activeSection === item.id
-                    ? 'text-purple-600 dark:text-purple-400 bg-purple-100/50 dark:bg-purple-900/30'
-                    : 'text-muted-foreground hover:text-foreground hover:bg-accent/30'
+                    ? 'text-purple-600 dark:text-purple-400 bg-purple-100/50 dark:bg-purple-900/30 shadow-lg'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-accent/50 hover:shadow-md'
                 }`}
               >
-                {item.label}
+                <span className="group-hover:scale-110 transition-transform duration-300">{item.label}</span>
               </button>
             ))}
 
@@ -98,18 +98,18 @@ export default function Navbar() {
                 variant="ghost"
                 size="icon"
                 onClick={handleThemeToggle}
-                className="rounded-full"
+                className="group w-8 h-8 md:w-9 md:h-9 rounded-full hover:bg-accent/50 hover:scale-110 transition-all duration-300"
               >
         {resolvedTheme === 'dark' ? (
-                  <Sun className="w-5 h-5" />
+                  <Sun className="w-4 h-4 md:w-5 md:h-5 group-hover:rotate-45 transition-transform duration-300" />
                 ) : (
-                  <Moon className="w-5 h-5" />
+                  <Moon className="w-4 h-4 md:w-5 md:h-5 group-hover:rotate-12 transition-transform duration-300" />
                 )}
               </Button>
             )}
 
-            <button className="bg-gradient-to-r from-purple-500 to-blue-500 text-white px-6 py-2.5 rounded-full text-sm font-semibold hover:from-purple-600 hover:to-blue-600 transition-all duration-200 hover:scale-105 shadow-lg hover:shadow-xl">
-              Get Started
+            <button className="group bg-gradient-to-r from-purple-500 to-blue-500 text-white px-4 md:px-6 py-2 md:py-2.5 rounded-full text-sm font-semibold hover:from-purple-600 hover:to-blue-600 transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl transform">
+              <span className="group-hover:scale-110 transition-transform duration-300">Get Started</span>
             </button>
           </div>
 
@@ -120,12 +120,12 @@ export default function Navbar() {
                 variant="ghost"
                 size="icon"
                 onClick={handleThemeToggle}
-                className="rounded-full"
+                className="w-8 h-8 rounded-full hover:bg-accent/50 hover:scale-110 transition-all duration-300 group"
               >
         {resolvedTheme === 'dark' ? (
-                  <Sun className="w-5 h-5" />
+                  <Sun className="w-4 h-4 group-hover:rotate-45 transition-transform duration-300" />
                 ) : (
-                  <Moon className="w-5 h-5" />
+                  <Moon className="w-4 h-4 group-hover:rotate-12 transition-transform duration-300" />
                 )}
               </Button>
             )}
@@ -133,12 +133,12 @@ export default function Navbar() {
               variant="ghost"
               size="icon"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="rounded-full"
+              className="w-8 h-8 rounded-full hover:bg-accent/50 hover:scale-110 transition-all duration-300 group"
             >
               {mobileMenuOpen ? (
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4 group-hover:rotate-90 transition-transform duration-300" />
               ) : (
-                <Menu className="w-5 h-5" />
+                <Menu className="w-4 h-4 group-hover:scale-110 transition-transform duration-300" />
               )}
             </Button>
           </div>
@@ -146,23 +146,23 @@ export default function Navbar() {
 
         {/* Mobile Menu */}
         {mobileMenuOpen && (
-          <div className="md:hidden border-t border-border/20">
+          <div className="md:hidden border-t border-border/30 bg-background/95 backdrop-blur-xl">
             <div className="py-4 space-y-2">
               {navItems.map((item) => (
                 <button
                   key={item.id}
                   onClick={() => scrollToSection(item.id)}
-                  className={`block w-full text-left px-4 py-3 rounded-lg text-base font-medium transition-all ${
+                  className={`group block w-full text-left px-4 py-3 rounded-lg text-base font-medium transition-all duration-300 hover:scale-105 ${
                     activeSection === item.id
-                      ? 'text-purple-600 dark:text-purple-400 bg-purple-100/50 dark:bg-purple-900/30'
-                      : 'text-muted-foreground'
+                      ? 'text-purple-600 dark:text-purple-400 bg-purple-100/50 dark:bg-purple-900/30 shadow-lg'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-accent/50'
                   }`}
                 >
-                  {item.label}
+                  <span className="group-hover:scale-110 transition-transform duration-300">{item.label}</span>
                 </button>
               ))}
-              <button className="w-full mt-4 bg-gradient-to-r from-purple-500 to-blue-500 text-white px-6 py-3 rounded-full text-base font-semibold">
-                Get Started
+              <button className="group w-full mt-4 bg-gradient-to-r from-purple-500 to-blue-500 text-white px-6 py-3 rounded-full text-base font-semibold hover:from-purple-600 hover:to-blue-600 transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl transform">
+                <span className="group-hover:scale-110 transition-transform duration-300">Get Started</span>
               </button>
             </div>
           </div>
