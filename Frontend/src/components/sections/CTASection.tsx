@@ -1,5 +1,6 @@
 import { Play, ArrowRight } from "lucide-react";
 import { useRef } from "react";
+import LoadingLink from "../LoadingLink";
 
 export default function CTASection() {
   const containerRef = useRef<HTMLElement>(null);
@@ -29,10 +30,13 @@ export default function CTASection() {
           
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 md:gap-6 justify-center items-center">
-            <button className="group relative inline-flex items-center gap-3 rounded-full bg-gradient-to-r from-[#0db2f3] to-blue-500 px-8 md:px-10 py-4 md:py-5 font-semibold text-white hover:scale-105 transition-all duration-300 shadow-lg shadow-[#0db2f3]/30 hover:shadow-xl hover:shadow-[#0db2f3]/40">
+            <LoadingLink 
+              href="/login"
+              className="group relative inline-flex items-center gap-3 rounded-full bg-gradient-to-r from-[#0db2f3] to-blue-500 px-8 md:px-10 py-4 md:py-5 font-semibold text-white hover:scale-105 transition-all duration-300 shadow-lg shadow-[#0db2f3]/30 hover:shadow-xl hover:shadow-[#0db2f3]/40"
+            >
               <Play className="w-5 h-5 md:w-6 md:h-6 group-hover:scale-110 transition-transform duration-300" />
               <span className="text-base md:text-lg">Start free trial</span>
-            </button>
+            </LoadingLink>
             <button className="group inline-flex items-center gap-3 px-8 md:px-10 py-4 md:py-5 font-semibold text-white dark:text-white light:text-gray-900 border border-[#0db2f3]/30 rounded-full hover:bg-[#0db2f3]/10 hover:border-[#0db2f3]/50 transition-all duration-300">
               <span className="text-base md:text-lg group-hover:text-[#0db2f3] transition-colors duration-300">See how it works</span>
               <ArrowRight className="w-5 h-5 md:w-6 md:h-6 group-hover:translate-x-1 group-hover:text-[#0db2f3] transition-all duration-300" />
