@@ -2,8 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { useTheme } from 'next-themes';
+import { usePathname } from 'next/navigation';
 import { Sun, Moon, Menu, X, Mic, Brain } from 'lucide-react';
 import { Button } from './ui/button';
+import LoadingLink from './LoadingLink';
 
 export default function Navbar() {
   const [mounted, setMounted] = useState(false);
@@ -11,6 +13,7 @@ export default function Navbar() {
   const [activeSection, setActiveSection] = useState('hero');
   const [scrolled, setScrolled] = useState(false);
   const { resolvedTheme, setTheme } = useTheme();
+  const pathname = usePathname();
 
   useEffect(() => setMounted(true), []);
 
@@ -21,6 +24,9 @@ export default function Navbar() {
 
   // Track scroll position for navbar background
   useEffect(() => {
+    // Don't set up scroll listeners on login page
+    if (pathname === '/login') return;
+
     const handleScroll = () => {
       const scrollPosition = window.scrollY;
       setScrolled(scrollPosition > 50);
@@ -44,7 +50,12 @@ export default function Navbar() {
 
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [pathname]);
+
+  // Don't render navbar on login page - AFTER all hooks are called
+  if (pathname === '/login') {
+    return null;
+  }
 
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
@@ -138,11 +149,14 @@ export default function Navbar() {
               </Button>
             )}
 
-            <button className="group relative bg-gradient-to-r from-[#0db2f3] to-blue-500 text-white px-6 py-2.5 rounded-full text-sm font-semibold hover:from-[#0db2f3]/90 hover:to-blue-500/90 transition-all duration-300 hover:scale-105 shadow-lg shadow-[#0db2f3]/30 hover:shadow-xl hover:shadow-[#0db2f3]/40 overflow-hidden">
+            <LoadingLink 
+              href="/login"
+              className="group relative bg-gradient-to-r from-[#0db2f3] to-blue-500 text-white px-6 py-2.5 rounded-full text-sm font-semibold hover:from-[#0db2f3]/90 hover:to-blue-500/90 transition-all duration-300 hover:scale-105 shadow-lg shadow-[#0db2f3]/30 hover:shadow-xl hover:shadow-[#0db2f3]/40 overflow-hidden inline-flex items-center"
+            >
               {/* Rotating border effect */}
               <div className="absolute inset-0 rounded-full bg-gradient-to-r from-[#0db2f3] via-blue-400 to-[#0db2f3] opacity-0 group-hover:opacity-20 transition-opacity duration-300" style={{ animation: 'spin 3s linear infinite' }}></div>
               <span className="relative group-hover:scale-110 transition-transform duration-300">Get Started</span>
-            </button>
+            </LoadingLink>
           </div>
 
           {/* Mobile menu button */}
@@ -207,11 +221,14 @@ export default function Navbar() {
                 </div>
               </div>
               
-              <button className="group relative w-full mt-3 mx-3 max-w-[calc(100%-24px)] bg-gradient-to-r from-[#0db2f3] to-blue-500 text-white px-6 py-3 rounded-full text-base font-semibold hover:from-[#0db2f3]/90 hover:to-blue-500/90 transition-all duration-300 hover:scale-105 shadow-lg shadow-[#0db2f3]/30 hover:shadow-xl overflow-hidden">
+              <LoadingLink 
+                href="/login"
+                className="group relative w-full mt-3 mx-3 max-w-[calc(100%-24px)] bg-gradient-to-r from-[#0db2f3] to-blue-500 text-white px-6 py-3 rounded-full text-base font-semibold hover:from-[#0db2f3]/90 hover:to-blue-500/90 transition-all duration-300 hover:scale-105 shadow-lg shadow-[#0db2f3]/30 hover:shadow-xl overflow-hidden inline-flex items-center justify-center"
+              >
                 {/* Rotating border effect */}
                 <div className="absolute inset-0 rounded-full bg-gradient-to-r from-[#0db2f3] via-blue-400 to-[#0db2f3] opacity-0 group-hover:opacity-20 transition-opacity duration-300" style={{ animation: 'spin 3s linear infinite' }}></div>
                 <span className="relative group-hover:scale-110 transition-transform duration-300">Get Started</span>
-              </button>
+              </LoadingLink>
             </div>
           </div>
         )}
