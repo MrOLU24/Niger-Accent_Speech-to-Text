@@ -10,6 +10,7 @@ export default function AboutSection() {
   // Interactive demo state
   const [currentDemoIndex, setCurrentDemoIndex] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [isClient, setIsClient] = useState(false);
 
   const demoMessages = [
     {
@@ -39,8 +40,15 @@ export default function AboutSection() {
     },
   ];
 
-  // Auto-cycle through demo messages
+  // Check if we're on the client side
   useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  // Auto-cycle through demo messages - only on client side
+  useEffect(() => {
+    if (!isClient) return;
+
     const interval = setInterval(() => {
       setIsAnimating(true);
       setTimeout(() => {
@@ -50,7 +58,7 @@ export default function AboutSection() {
     }, 3000);
 
     return () => clearInterval(interval);
-  }, [demoMessages.length]);
+  }, [demoMessages.length, isClient]);
 
   const features = [
     {
@@ -325,52 +333,73 @@ export default function AboutSection() {
 
               {/* Interactive Message Display */}
               <div className="relative min-h-[200px] space-y-4">
-                {demoMessages.map((message, index) => (
-                  <div
-                    key={index}
-                    className={`transform transition-all duration-500 ${
-                      index === currentDemoIndex
-                        ? `translate-y-0 opacity-100 ${
-                            isAnimating ? "scale-95" : "scale-100"
-                          }`
-                        : index < currentDemoIndex
-                        ? "translate-y-[-100px] opacity-0"
-                        : "translate-y-[100px] opacity-0"
-                    }`}
-                    style={{
-                      position:
-                        index === currentDemoIndex ? "relative" : "absolute",
-                      top: index === currentDemoIndex ? "auto" : "0",
-                    }}
-                  >
-                    {/* Original Speech */}
+                {isClient ? (
+                  demoMessages.map((message, index) => (
+                    <div
+                      key={index}
+                      className={`transform transition-all duration-500 ${
+                        index === currentDemoIndex
+                          ? `translate-y-0 opacity-100 ${
+                              isAnimating ? "scale-95" : "scale-100"
+                            }`
+                          : index < currentDemoIndex
+                          ? "translate-y-[-100px] opacity-0"
+                          : "translate-y-[100px] opacity-0"
+                      }`}
+                      style={{
+                        position:
+                          index === currentDemoIndex ? "relative" : "absolute",
+                        top: index === currentDemoIndex ? "auto" : "0",
+                      }}
+                    >
+                      {/* Original Speech */}
+                      <div className="bg-gradient-to-r from-[#0db2f3]/20 to-blue-500/20 p-4 rounded-2xl border-l-4 border-[#0db2f3]">
+                        <p className="text-white dark:text-white light:text-gray-900 font-medium">
+                          &ldquo;{message.text}&rdquo;
+                        </p>
+                        <div className="flex items-center gap-2 mt-2">
+                          <span
+                            className={`px-2 py-1 rounded-full text-xs font-medium ${
+                              message.type === "pidgin"
+                                ? "bg-[#0db2f3]/20 text-[#0db2f3]"
+                                : "bg-blue-500/20 text-blue-400"
+                            }`}
+                          >
+                            {message.type === "pidgin"
+                              ? "Nigerian Pidgin"
+                              : "Mixed"}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Translation */}
+                      <div className="ml-4 pl-4 border-l-2 border-gray-500/30">
+                        <p className="text-gray-300 dark:text-gray-300 light:text-gray-600 italic">
+                          Translation: {message.translation}
+                        </p>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  // Fallback for SSR - show first message without animations
+                  <div className="transform translate-y-0 opacity-100">
                     <div className="bg-gradient-to-r from-[#0db2f3]/20 to-blue-500/20 p-4 rounded-2xl border-l-4 border-[#0db2f3]">
                       <p className="text-white dark:text-white light:text-gray-900 font-medium">
-                        &ldquo;{message.text}&rdquo;
+                        &ldquo;{demoMessages[0].text}&rdquo;
                       </p>
                       <div className="flex items-center gap-2 mt-2">
-                        <span
-                          className={`px-2 py-1 rounded-full text-xs font-medium ${
-                            message.type === "pidgin"
-                              ? "bg-[#0db2f3]/20 text-[#0db2f3]"
-                              : "bg-blue-500/20 text-blue-400"
-                          }`}
-                        >
-                          {message.type === "pidgin"
-                            ? "Nigerian Pidgin"
-                            : "Mixed"}
+                        <span className="px-2 py-1 rounded-full text-xs font-medium bg-[#0db2f3]/20 text-[#0db2f3]">
+                          Nigerian Pidgin
                         </span>
                       </div>
                     </div>
-
-                    {/* Translation */}
                     <div className="ml-4 pl-4 border-l-2 border-gray-500/30">
                       <p className="text-gray-300 dark:text-gray-300 light:text-gray-600 italic">
-                        Translation: {message.translation}
+                        Translation: {demoMessages[0].translation}
                       </p>
                     </div>
                   </div>
-                ))}
+                )}
               </div>
 
               {/* Processing Stats */}
@@ -396,7 +425,9 @@ export default function AboutSection() {
                   <div
                     key={index}
                     className={`h-1 rounded-full transition-all duration-300 ${
-                      index === currentDemoIndex
+                      isClient && index === currentDemoIndex
+                        ? "w-8 bg-[#0db2f3]"
+                        : index === 0 && !isClient
                         ? "w-8 bg-[#0db2f3]"
                         : "w-2 bg-gray-500/30"
                     }`}
