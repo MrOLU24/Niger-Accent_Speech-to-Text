@@ -2,10 +2,11 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Navbar from "../components/Navbar";
 import { ThemeProvider } from "../components/ThemeProvider";
+import SimplePageLoader from "../components/SimplePageLoader";
 
 export const metadata: Metadata = {
   title: "ToriType | Nigerian Speech-to-Text AI Platform",
-  description: "Convert Nigerian English and Pidgin speech to text with ToriType's specialized AI model.",
+  description: "Convert Nigerian Accent and Pidgin speech to text with ToriType's specialized AI model.",
 };
 
 export default function RootLayout({
@@ -22,6 +23,7 @@ export default function RootLayout({
           enableSystem={true}
           storageKey="toritype-theme"
         >
+          <SimplePageLoader />
           <Navbar />
           {children}
         </ThemeProvider>
