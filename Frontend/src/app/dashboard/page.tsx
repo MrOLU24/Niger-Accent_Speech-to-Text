@@ -112,10 +112,7 @@ export default function Dashboard() {
       
       mediaRecorder.start();
       
-      // Simulate real-time transcription
-      setTimeout(() => {
-        setCurrentTranscript('Starting transcription...');
-      }, 1000);
+      setCurrentTranscript('Starting transcription...');
       
       setTimeout(() => {
         setCurrentTranscript('How you dey? I wan talk about...');
@@ -145,7 +142,6 @@ export default function Dashboard() {
     setIsRecording(false);
     setIsPaused(false);
     
-    // Add new recording to list
     const newRecording: Recording = {
       id: Date.now().toString(),
       name: `Recording ${recordings.length + 1}`,
@@ -185,11 +181,9 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-[#0e0f16]">
-      {/* Navigation Bar */}
       <nav className="sticky top-0 z-50 bg-[#0e0f16]/80 backdrop-blur-xl border-b border-white/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            {/* Logo */}
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 bg-gradient-to-r from-[#0db2f3] to-blue-500 rounded-xl flex items-center justify-center">
                 <Mic className="w-5 h-5 text-white" />
@@ -202,7 +196,6 @@ export default function Dashboard() {
               </div>
             </div>
 
-            {/* Navigation Items */}
             <div className="hidden md:flex items-center space-x-8">
               <button className="flex items-center space-x-2 text-white/80 hover:text-[#0db2f3] transition-colors">
                 <Home className="w-4 h-4" />
@@ -222,7 +215,6 @@ export default function Dashboard() {
               </button>
             </div>
 
-            {/* User Menu */}
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-3">
                 <img
@@ -252,11 +244,9 @@ export default function Dashboard() {
         </div>
       </nav>
 
-      {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           
-          {/* Recording Section */}
           <div className="space-y-6">
             <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6">
               <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
@@ -266,9 +256,7 @@ export default function Dashboard() {
                 Voice Recording
               </h2>
               
-              {/* Recording Controls */}
               <div className="text-center space-y-6">
-                {/* Timer Display */}
                 <div className="text-center">
                   <div className="text-4xl font-mono font-bold text-white mb-2">
                     {formatTime(recordingTime)}
@@ -281,7 +269,6 @@ export default function Dashboard() {
                   )}
                 </div>
 
-                {/* Recording Button */}
                 <div className="flex justify-center">
                   {!isRecording ? (
                     <Button
@@ -310,7 +297,6 @@ export default function Dashboard() {
                   )}
                 </div>
 
-                {/* Live Transcript */}
                 {isRecording && currentTranscript && (
                   <div className="bg-white/5 border border-white/10 rounded-xl p-4 text-left">
                     <h3 className="text-sm font-medium text-white/80 mb-2 flex items-center gap-2">
@@ -323,7 +309,6 @@ export default function Dashboard() {
               </div>
             </div>
 
-            {/* Upload Section */}
             <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6">
               <h3 className="text-xl font-semibold text-white mb-4 flex items-center gap-3">
                 <Upload className="w-5 h-5 text-[#0db2f3]" />
@@ -341,7 +326,6 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* Recent Recordings */}
           <div className="space-y-6">
             <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6">
               <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">

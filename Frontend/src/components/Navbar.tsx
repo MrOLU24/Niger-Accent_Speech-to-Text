@@ -22,16 +22,13 @@ export default function Navbar() {
     setTheme(isDark ? 'light' : 'dark');
   };
 
-  // Track scroll position for navbar background
   useEffect(() => {
-    // Don't set up scroll listeners on login page
     if (pathname === '/login') return;
 
     const handleScroll = () => {
       const scrollPosition = window.scrollY;
       setScrolled(scrollPosition > 50);
       
-      // Track active section
       const sections = ['hero', 'about', 'features', 'testimonials'];
       const scrollPos = scrollPosition + 100;
 
@@ -52,7 +49,6 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [pathname]);
 
-  // Don't render navbar on login page - AFTER all hooks are called
   if (pathname === '/login') {
     return null;
   }
@@ -60,7 +56,7 @@ export default function Navbar() {
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
     if (element) {
-      const navHeight = window.innerWidth < 768 ? 70 : 80; // Smaller offset for mobile
+      const navHeight = window.innerWidth < 768 ? 70 : 80;
       const offsetTop = element.offsetTop - navHeight;
       window.scrollTo({
         top: offsetTop,
@@ -84,13 +80,11 @@ export default function Navbar() {
     }`}>
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16 md:h-18 lg:h-20">
-          {/* Logo with enhanced branding */}
           <button 
             onClick={() => scrollToSection('hero')}
             className="flex items-center space-x-1.5 sm:space-x-2 md:space-x-3 group transition-all duration-300 hover:scale-105"
           >
             <div className="relative w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10 bg-gradient-to-r from-[#0db2f3] to-blue-500 rounded-xl flex items-center justify-center group-hover:scale-105 group-hover:rotate-3 transition-all duration-300 shadow-lg shadow-[#0db2f3]/30">
-              {/* Rotating border effect */}
               <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#0db2f3] via-blue-400 to-[#0db2f3] opacity-0 group-hover:opacity-30 transition-opacity duration-300" style={{ animation: 'spin 4s linear infinite' }}></div>
               <Mic className="relative w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5 text-white" />
             </div>
@@ -104,7 +98,7 @@ export default function Navbar() {
             </div>
           </button>
 
-          {/* Desktop Navigation */}
+
           <div className="hidden md:flex items-center space-x-6 lg:space-x-8">
             {navItems.map((item) => (
               <button
@@ -123,7 +117,7 @@ export default function Navbar() {
               </button>
             ))}
 
-            {/* AI Status Badge */}
+
             <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#0db2f3]/10 border border-[#0db2f3]/20">
               <div className="flex items-center gap-1">
                 <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
@@ -133,7 +127,7 @@ export default function Navbar() {
               </div>
             </div>
 
-            {/* Theme Toggle */}
+
             {mounted && (
               <Button
                 variant="ghost"
@@ -153,13 +147,13 @@ export default function Navbar() {
               href="/login"
               className="group relative bg-gradient-to-r from-[#0db2f3] to-blue-500 text-white px-6 py-2.5 rounded-full text-sm font-semibold hover:from-[#0db2f3]/90 hover:to-blue-500/90 transition-all duration-300 hover:scale-105 shadow-lg shadow-[#0db2f3]/30 hover:shadow-xl hover:shadow-[#0db2f3]/40 overflow-hidden inline-flex items-center"
             >
-              {/* Rotating border effect */}
+
               <div className="absolute inset-0 rounded-full bg-gradient-to-r from-[#0db2f3] via-blue-400 to-[#0db2f3] opacity-0 group-hover:opacity-20 transition-opacity duration-300" style={{ animation: 'spin 3s linear infinite' }}></div>
               <span className="relative group-hover:scale-110 transition-transform duration-300">Get Started</span>
             </LoadingLink>
           </div>
 
-          {/* Mobile menu button */}
+
           <div className="md:hidden flex items-center space-x-1.5 sm:space-x-2">
             {mounted && (
               <Button
@@ -190,7 +184,7 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* Mobile Menu */}
+
         {mobileMenuOpen && (
           <div className="md:hidden border-t border-[#0db2f3]/20 bg-[#0e0f16]/95 dark:bg-[#0e0f16]/95 light:bg-white/95 backdrop-blur-xl">
             <div className="py-3 px-2 space-y-1">
@@ -225,7 +219,7 @@ export default function Navbar() {
                 href="/login"
                 className="group relative w-full mt-3 mx-3 max-w-[calc(100%-24px)] bg-gradient-to-r from-[#0db2f3] to-blue-500 text-white px-6 py-3 rounded-full text-base font-semibold hover:from-[#0db2f3]/90 hover:to-blue-500/90 transition-all duration-300 hover:scale-105 shadow-lg shadow-[#0db2f3]/30 hover:shadow-xl overflow-hidden inline-flex items-center justify-center"
               >
-                {/* Rotating border effect */}
+
                 <div className="absolute inset-0 rounded-full bg-gradient-to-r from-[#0db2f3] via-blue-400 to-[#0db2f3] opacity-0 group-hover:opacity-20 transition-opacity duration-300" style={{ animation: 'spin 3s linear infinite' }}></div>
                 <span className="relative group-hover:scale-110 transition-transform duration-300">Get Started</span>
               </LoadingLink>
