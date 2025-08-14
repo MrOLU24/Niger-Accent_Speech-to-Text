@@ -2,15 +2,10 @@ import Image from "next/image";
 import { Star, ChevronLeft, ChevronRight } from "lucide-react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination, Autoplay } from "swiper/modules";
-import { useGSAP } from "@gsap/react";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useRef } from "react";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
-
-gsap.registerPlugin(ScrollTrigger);
 
 export default function TestimonialsSection() {
   const containerRef = useRef<HTMLElement>(null);
@@ -83,40 +78,6 @@ export default function TestimonialsSection() {
       gradient: "from-blue-600 to-[#0db2f3]"
     },
   ];
-
-  useGSAP(() => {
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: containerRef.current,
-        start: "top 80%",
-        end: "bottom 20%",
-        toggleActions: "play none none reverse"
-      }
-    });
-
-    // Animate heading
-    tl.fromTo(headingRef.current, {
-      y: 50,
-      opacity: 0
-    }, {
-      y: 0,
-      opacity: 1,
-      duration: 0.8,
-      ease: "power3.out"
-    });
-
-    // Animate swiper container
-    tl.fromTo(swiperRef.current, {
-      y: 80,
-      opacity: 0
-    }, {
-      y: 0,
-      opacity: 1,
-      duration: 0.8,
-      ease: "power3.out"
-    }, "-=0.4");
-
-  }, { scope: containerRef });
 
   return (
     <section 

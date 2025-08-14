@@ -1,93 +1,11 @@
 import { Play, ArrowRight } from "lucide-react";
-import { useGSAP } from "@gsap/react";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useRef } from "react";
-
-gsap.registerPlugin(ScrollTrigger);
 
 export default function CTASection() {
   const containerRef = useRef<HTMLElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const buttonsRef = useRef<HTMLDivElement>(null);
-
-  useGSAP(() => {
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: containerRef.current,
-        start: "top 80%",
-        end: "bottom 20%",
-        toggleActions: "play none none reverse"
-      }
-    });
-
-    // Animate card background
-    tl.fromTo(cardRef.current, {
-      scale: 0.9,
-      opacity: 0,
-      y: 50
-    }, {
-      scale: 1,
-      opacity: 1,
-      y: 0,
-      duration: 0.8,
-      ease: "back.out(1.7)"
-    });
-
-    // Animate content
-    tl.fromTo(contentRef.current, {
-      y: 30,
-      opacity: 0
-    }, {
-      y: 0,
-      opacity: 1,
-      duration: 0.6,
-      ease: "power3.out"
-    }, "-=0.4");
-
-    // Animate buttons
-    tl.fromTo(buttonsRef.current?.children || [], {
-      y: 20,
-      opacity: 0,
-      scale: 0.9
-    }, {
-      y: 0,
-      opacity: 1,
-      scale: 1,
-      duration: 0.5,
-      stagger: 0.1,
-      ease: "back.out(1.7)"
-    }, "-=0.3");
-
-  }, { scope: containerRef });
-
-  useGSAP(() => {
-    // Floating animation for CTA card
-    gsap.to(cardRef.current, {
-      y: -10,
-      duration: 4,
-      ease: "power2.inOut",
-      yoyo: true,
-      repeat: -1
-    });
-
-    // Button hover animations
-    const buttons = buttonsRef.current?.children;
-    if (buttons) {
-      Array.from(buttons).forEach((button) => {
-        gsap.set(button, { scale: 1 });
-        
-        button.addEventListener('mouseenter', () => {
-          gsap.to(button, { scale: 1.05, duration: 0.3, ease: "power2.out" });
-        });
-        
-        button.addEventListener('mouseleave', () => {
-          gsap.to(button, { scale: 1, duration: 0.3, ease: "power2.out" });
-        });
-      });
-    }
-  });
 
   return (
     <section 

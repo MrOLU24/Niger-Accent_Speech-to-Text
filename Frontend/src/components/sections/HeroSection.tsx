@@ -365,7 +365,7 @@ export default function HeroSection() {
                         🎤 Press record to start speaking in English or
                         Pidgin... <br />
                         <span className="text-[#0db2f3]">
-                          Try: "How you dey?" or "What's happening?"
+                          Try: &ldquo;How you dey?&rdquo; or &ldquo;What&apos;s happening?&rdquo;
                         </span>
                       </p>
                     )}

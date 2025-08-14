@@ -1,10 +1,5 @@
 import { Globe, MessageSquare, Zap, Headphones } from "lucide-react";
-import { useGSAP } from "@gsap/react";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useRef } from "react";
-
-gsap.registerPlugin(ScrollTrigger);
 
 export default function AboutSection() {
   const containerRef = useRef<HTMLElement>(null);
@@ -32,64 +27,6 @@ export default function AboutSection() {
       gradient: "from-[#0db2f3] to-blue-600"
     },
   ];
-
-  useGSAP(() => {
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: containerRef.current,
-        start: "top 80%",
-        end: "bottom 20%",
-        toggleActions: "play none none reverse"
-      }
-    });
-
-    // Animate heading
-    tl.fromTo(headingRef.current, {
-      y: 50,
-      opacity: 0
-    }, {
-      y: 0,
-      opacity: 1,
-      duration: 0.8,
-      ease: "power3.out"
-    });
-
-    // Animate features
-    tl.fromTo(featuresRef.current?.children || [], {
-      x: -50,
-      opacity: 0
-    }, {
-      x: 0,
-      opacity: 1,
-      duration: 0.6,
-      stagger: 0.2,
-      ease: "power3.out"
-    }, "-=0.4");
-
-    // Animate demo
-    tl.fromTo(demoRef.current, {
-      x: 50,
-      opacity: 0
-    }, {
-      x: 0,
-      opacity: 1,
-      duration: 0.8,
-      ease: "power3.out"
-    }, "-=0.6");
-
-  }, { scope: containerRef });
-
-  useGSAP(() => {
-    // Floating animation for feature icons
-    gsap.to(".feature-icon", {
-      y: -5,
-      duration: 2,
-      ease: "power2.inOut",
-      yoyo: true,
-      repeat: -1,
-      stagger: 0.3
-    });
-  });
 
   return (
     <section 

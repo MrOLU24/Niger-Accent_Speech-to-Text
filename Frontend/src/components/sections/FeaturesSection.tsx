@@ -6,12 +6,7 @@ import {
   MessageSquare,
   ArrowRight,
 } from "lucide-react";
-import { useGSAP } from "@gsap/react";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useRef } from "react";
-
-gsap.registerPlugin(ScrollTrigger);
 
 export default function FeaturesSection() {
   const containerRef = useRef<HTMLElement>(null);
@@ -56,56 +51,6 @@ export default function FeaturesSection() {
       gradient: "from-blue-500 to-[#0db2f3]"
     },
   ];
-
-  useGSAP(() => {
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: containerRef.current,
-        start: "top 80%",
-        end: "bottom 20%",
-        toggleActions: "play none none reverse"
-      }
-    });
-
-    // Animate heading
-    tl.fromTo(headingRef.current, {
-      y: 50,
-      opacity: 0
-    }, {
-      y: 0,
-      opacity: 1,
-      duration: 0.8,
-      ease: "power3.out"
-    });
-
-    // Animate feature cards
-    tl.fromTo(gridRef.current?.children || [], {
-      y: 80,
-      opacity: 0,
-      scale: 0.8
-    }, {
-      y: 0,
-      opacity: 1,
-      scale: 1,
-      duration: 0.6,
-      stagger: 0.1,
-      ease: "back.out(1.7)"
-    }, "-=0.4");
-
-  }, { scope: containerRef });
-
-  useGSAP(() => {
-    // Floating animation for feature icons
-    gsap.to(".feature-card-icon", {
-      y: -8,
-      rotation: 5,
-      duration: 3,
-      ease: "power2.inOut",
-      yoyo: true,
-      repeat: -1,
-      stagger: 0.4
-    });
-  });
 
   return (
     <section 
