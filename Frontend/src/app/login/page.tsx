@@ -4,15 +4,33 @@ import { useState } from 'react';
 import { ArrowLeft, Mic } from "lucide-react";
 import { Button } from "../../components/ui/button";
 import LoadingLink from "../../components/LoadingLink";
+import { createClient } from "../../lib/supabase/client";
 
 export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
+  const supabase = createClient();
 
   const handleGoogleSignIn = async () => {
-    setIsLoading(true);
-    // TODO: Implement Google OAuth with Supabase
-    console.log('Google sign in');
-    setTimeout(() => setIsLoading(false), 2000); // Simulate loading
+    try {
+      setIsLoading(true);
+      
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
+
+      if (error) {
+        console.error('Authentication error:', error.message);
+        alert('Authentication failed. Please try again.');
+      }
+    } catch (error) {
+      console.error('Unexpected error:', error);
+      alert('An unexpected error occurred. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
