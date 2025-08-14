@@ -199,7 +199,6 @@ export default function Navbar() {
               
               {/* Mobile AI Status */}
               <div className="flex items-center justify-center gap-2 px-3 py-2 mt-2 rounded-full bg-[#0db2f3]/10 border border-[#0db2f3]/20 mx-3">
-                <Brain className="w-3 h-3 text-[#0db2f3]" />
                 <div className="flex items-center gap-1">
                   <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
                   <span className="text-xs font-medium text-gray-300 dark:text-gray-300 light:text-gray-600">
