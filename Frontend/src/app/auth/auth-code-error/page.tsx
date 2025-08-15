@@ -13,7 +13,7 @@ export default function AuthCodeError() {
         <div className="space-y-2">
           <h1 className="text-2xl font-bold text-white">Authentication Error</h1>
           <p className="text-gray-400">
-            Sorry, we couldn't sign you in. The authentication code was invalid or expired.
+            Sorry, we couldn&apos;t sign you in. The authentication code was invalid or expired.
           </p>
         </div>
 

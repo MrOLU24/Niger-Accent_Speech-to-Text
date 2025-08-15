@@ -1,12 +1,12 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { createClient } from '../../lib/supabase/client';
 import { useRouter } from 'next/navigation';
 import { Button } from '../../components/ui/button';
+import Image from 'next/image';
 import { 
   Mic, 
-  MicOff, 
   Upload, 
   Download, 
   Play, 
@@ -15,13 +15,23 @@ import {
   FileAudio, 
   History, 
   Settings, 
-  User,
   LogOut,
   Home,
   Trash2,
   Copy,
-  Check
+  Check,
+  Plus,
+  X
 } from 'lucide-react';
+
+interface User {
+  id: string;
+  email?: string;
+  user_metadata?: {
+    full_name?: string;
+    avatar_url?: string;
+  };
+}
 
 interface Recording {
   id: string;
@@ -33,11 +43,13 @@ interface Recording {
 }
 
 export default function Dashboard() {
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [isRecording, setIsRecording] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
   const [currentTranscript, setCurrentTranscript] = useState('');
+  const [activeTab, setActiveTab] = useState('record');
+  const [showUploadModal, setShowUploadModal] = useState(false);
   const [recordings, setRecordings] = useState<Recording[]>([
     {
       id: '1',
@@ -63,17 +75,18 @@ export default function Dashboard() {
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
+  const getUser = useCallback(async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      router.push('/login');
+    } else {
+      setUser(user);
+    }
+  }, [router, supabase.auth]);
+
   useEffect(() => {
-    const getUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        router.push('/login');
-      } else {
-        setUser(user);
-      }
-    };
     getUser();
-  }, []);
+  }, [getUser]);
 
   useEffect(() => {
     if (isRecording && !isPaused) {
@@ -171,6 +184,22 @@ export default function Dashboard() {
     setRecordings(prev => prev.filter(r => r.id !== id));
   };
 
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      console.log('File selected:', file.name);
+      setShowUploadModal(false);
+      // TODO: Implement file upload logic
+    }
+  };
+
+  const menuItems = [
+    { id: 'overview', label: 'Overview', icon: Home },
+    { id: 'record', label: 'Record', icon: Mic },
+    { id: 'history', label: 'History', icon: History },
+    { id: 'settings', label: 'Settings', icon: Settings },
+  ];
+
   if (!user) {
     return (
       <div className="min-h-screen bg-[#0e0f16] flex items-center justify-center">
@@ -180,172 +209,198 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0e0f16]">
-      <nav className="sticky top-0 z-50 bg-[#0e0f16]/80 backdrop-blur-xl border-b border-white/10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-r from-[#0db2f3] to-blue-500 rounded-xl flex items-center justify-center">
-                <Mic className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <h1 className="text-xl font-bold bg-gradient-to-r from-[#0db2f3] to-blue-400 bg-clip-text text-transparent">
-                  ToriType
-                </h1>
-                <p className="text-xs text-white/60">Dashboard</p>
-              </div>
+    <div className="min-h-screen bg-[#0e0f16] flex">
+      {/* Left Sidebar */}
+      <div className="w-64 bg-[#0a0b0f] border-r border-white/10 flex flex-col">
+        {/* Logo */}
+        <div className="p-6 border-b border-white/10">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-gradient-to-r from-[#0db2f3] to-blue-500 rounded-xl flex items-center justify-center">
+              <Mic className="w-5 h-5 text-white" />
             </div>
-
-            <div className="hidden md:flex items-center space-x-8">
-              <button className="flex items-center space-x-2 text-white/80 hover:text-[#0db2f3] transition-colors">
-                <Home className="w-4 h-4" />
-                <span>Overview</span>
-              </button>
-              <button className="flex items-center space-x-2 text-[#0db2f3] transition-colors">
-                <Mic className="w-4 h-4" />
-                <span>Record</span>
-              </button>
-              <button className="flex items-center space-x-2 text-white/80 hover:text-[#0db2f3] transition-colors">
-                <History className="w-4 h-4" />
-                <span>History</span>
-              </button>
-              <button className="flex items-center space-x-2 text-white/80 hover:text-[#0db2f3] transition-colors">
-                <Settings className="w-4 h-4" />
-                <span>Settings</span>
-              </button>
-            </div>
-
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-3">
-                <img
-                  src={user.user_metadata?.avatar_url || '/default-avatar.png'}
-                  alt="Profile"
-                  className="w-8 h-8 rounded-full border-2 border-[#0db2f3]/30"
-                />
-                <div className="hidden sm:block">
-                  <p className="text-sm font-medium text-white">
-                    {user.user_metadata?.full_name || user.email}
-                  </p>
-                  <p className="text-xs text-white/60">{user.email}</p>
-                </div>
-              </div>
-              
-              <Button
-                onClick={handleSignOut}
-                variant="outline"
-                size="sm"
-                className="bg-white/5 border-white/20 text-white hover:bg-white/10 hover:border-white/30"
-              >
-                <LogOut className="w-4 h-4 mr-2" />
-                Sign Out
-              </Button>
+            <div>
+              <h1 className="text-xl font-bold bg-gradient-to-r from-[#0db2f3] to-blue-400 bg-clip-text text-transparent">
+                ToriType
+              </h1>
+              <p className="text-xs text-white/60">Nigerian AI Platform</p>
             </div>
           </div>
         </div>
-      </nav>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          
-          <div className="space-y-6">
-            <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6">
-              <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
-                <div className="w-8 h-8 bg-gradient-to-r from-[#0db2f3] to-blue-500 rounded-lg flex items-center justify-center">
-                  <Mic className="w-4 h-4 text-white" />
-                </div>
-                Voice Recording
-              </h2>
-              
-              <div className="text-center space-y-6">
-                <div className="text-center">
-                  <div className="text-4xl font-mono font-bold text-white mb-2">
-                    {formatTime(recordingTime)}
-                  </div>
-                  {isRecording && (
-                    <div className="flex items-center justify-center gap-2 text-sm text-white/60">
-                      <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
-                      {isPaused ? 'Recording Paused' : 'Recording in Progress'}
-                    </div>
-                  )}
-                </div>
+        {/* Menu Items */}
+        <nav className="flex-1 p-4">
+          <div className="space-y-2">
+            {menuItems.map((item) => {
+              const Icon = item.icon;
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => setActiveTab(item.id)}
+                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 ${
+                    activeTab === item.id
+                      ? 'bg-[#0db2f3]/20 text-[#0db2f3] border border-[#0db2f3]/30'
+                      : 'text-white/70 hover:text-white hover:bg-white/5'
+                  }`}
+                >
+                  <Icon className="w-5 h-5" />
+                  <span className="font-medium">{item.label}</span>
+                </button>
+              );
+            })}
+          </div>
+        </nav>
 
-                <div className="flex justify-center">
-                  {!isRecording ? (
-                    <Button
-                      onClick={startRecording}
-                      className="w-20 h-20 rounded-full bg-gradient-to-r from-[#0db2f3] to-blue-500 hover:from-[#0db2f3]/80 hover:to-blue-500/80 shadow-lg shadow-[#0db2f3]/30 transition-all duration-300 hover:scale-105"
-                    >
-                      <Mic className="w-8 h-8 text-white" />
-                    </Button>
-                  ) : (
-                    <div className="flex items-center gap-4">
-                      <Button
-                        onClick={pauseRecording}
-                        variant="outline"
-                        className="w-12 h-12 rounded-full border-white/20 text-white hover:bg-white/10"
-                      >
-                        {isPaused ? <Play className="w-5 h-5" /> : <Pause className="w-5 h-5" />}
-                      </Button>
-                      
-                      <Button
-                        onClick={stopRecording}
-                        className="w-16 h-16 rounded-full bg-red-500 hover:bg-red-600 shadow-lg shadow-red-500/30 transition-all duration-300"
-                      >
-                        <Square className="w-6 h-6 text-white fill-current" />
-                      </Button>
-                    </div>
-                  )}
-                </div>
-
-                {isRecording && currentTranscript && (
-                  <div className="bg-white/5 border border-white/10 rounded-xl p-4 text-left">
-                    <h3 className="text-sm font-medium text-white/80 mb-2 flex items-center gap-2">
-                      <div className="w-2 h-2 bg-[#0db2f3] rounded-full animate-pulse"></div>
-                      Live Transcript
-                    </h3>
-                    <p className="text-white/90 text-sm leading-relaxed">{currentTranscript}</p>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6">
-              <h3 className="text-xl font-semibold text-white mb-4 flex items-center gap-3">
-                <Upload className="w-5 h-5 text-[#0db2f3]" />
-                Upload Audio File
-              </h3>
-              
-              <div className="border-2 border-dashed border-white/20 rounded-xl p-8 text-center hover:border-[#0db2f3]/50 transition-colors cursor-pointer">
-                <FileAudio className="w-12 h-12 text-white/60 mx-auto mb-4" />
-                <p className="text-white/80 mb-2">Drop your audio file here or click to browse</p>
-                <p className="text-white/60 text-sm">Supports MP3, WAV, M4A (Max 100MB)</p>
-                <Button className="mt-4 bg-gradient-to-r from-[#0db2f3] to-blue-500">
-                  Choose File
-                </Button>
-              </div>
+        {/* User Profile & Sign Out */}
+        <div className="p-4 border-t border-white/10">
+          <div className="flex items-center gap-3 mb-4 p-3 bg-white/5 rounded-xl">
+            <Image
+              src={user?.user_metadata?.avatar_url || '/default-avatar.png'}
+              alt="Profile"
+              width={40}
+              height={40}
+              className="w-10 h-10 rounded-full border-2 border-[#0db2f3]/30"
+            />
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-white truncate">
+                {user?.user_metadata?.full_name || user?.email}
+              </p>
+              <p className="text-xs text-white/60 truncate">{user?.email}</p>
             </div>
           </div>
+          <Button
+            onClick={handleSignOut}
+            variant="outline"
+            className="w-full bg-red-500/10 border-red-500/20 text-red-400 hover:bg-red-500/20 hover:border-red-500/30"
+          >
+            <LogOut className="w-4 h-4 mr-2" />
+            Sign Out
+          </Button>
+        </div>
+      </div>
 
-          <div className="space-y-6">
-            <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6">
-              <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
-                <History className="w-6 h-6 text-[#0db2f3]" />
-                Recent Recordings
-              </h2>
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col">
+        {/* Content Area */}
+        <main className="flex-1 p-8">
+          {activeTab === 'record' && (
+            <div className="max-w-4xl mx-auto">
+              <div className="text-center mb-8">
+                <h2 className="text-3xl font-bold text-white mb-2">Voice Recording Studio</h2>
+                <p className="text-white/60">Record your voice and get instant Nigerian-English transcriptions</p>
+              </div>
+
+              {/* Recording Interface */}
+              <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-3xl p-8 mb-8">
+                <div className="text-center space-y-8">
+                  {/* Timer */}
+                  <div>
+                    <div className="text-6xl font-mono font-bold text-white mb-2">
+                      {formatTime(recordingTime)}
+                    </div>
+                    {isRecording && (
+                      <div className="flex items-center justify-center gap-2 text-white/60">
+                        <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
+                        <span className="text-lg">{isPaused ? 'Recording Paused' : 'Recording in Progress'}</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Recording Controls */}
+                  <div className="flex justify-center items-center gap-6">
+                    {!isRecording ? (
+                      <>
+                        <Button
+                          onClick={startRecording}
+                          className="w-24 h-24 rounded-full bg-gradient-to-r from-[#0db2f3] to-blue-500 hover:from-[#0db2f3]/80 hover:to-blue-500/80 shadow-lg shadow-[#0db2f3]/30 transition-all duration-300 hover:scale-105"
+                        >
+                          <Mic className="w-10 h-10 text-white" />
+                        </Button>
+                        
+                        <Button
+                          onClick={() => setShowUploadModal(true)}
+                          className="w-16 h-16 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 transition-all duration-300 hover:scale-105"
+                        >
+                          <Plus className="w-8 h-8 text-white" />
+                        </Button>
+                      </>
+                    ) : (
+                      <>
+                        <Button
+                          onClick={pauseRecording}
+                          variant="outline"
+                          className="w-16 h-16 rounded-full border-white/20 text-white hover:bg-white/10"
+                        >
+                          {isPaused ? <Play className="w-6 h-6" /> : <Pause className="w-6 h-6" />}
+                        </Button>
+                        
+                        <Button
+                          onClick={stopRecording}
+                          className="w-20 h-20 rounded-full bg-red-500 hover:bg-red-600 shadow-lg shadow-red-500/30 transition-all duration-300"
+                        >
+                          <Square className="w-8 h-8 text-white fill-current" />
+                        </Button>
+                      </>
+                    )}
+                  </div>
+
+                  {/* Live Transcript */}
+                  {isRecording && currentTranscript && (
+                    <div className="bg-white/5 border border-white/10 rounded-2xl p-6 max-w-2xl mx-auto">
+                      <h3 className="text-lg font-medium text-white/80 mb-3 flex items-center gap-2">
+                        <div className="w-2 h-2 bg-[#0db2f3] rounded-full animate-pulse"></div>
+                        Live Transcript
+                      </h3>
+                      <p className="text-white/90 text-lg leading-relaxed">{currentTranscript}</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Quick Stats */}
+              <div className="grid grid-cols-3 gap-4">
+                <div className="bg-white/5 border border-white/10 rounded-2xl p-4 text-center">
+                  <div className="text-2xl font-bold text-[#0db2f3] mb-1">{recordings.length}</div>
+                  <div className="text-white/60 text-sm">Total Recordings</div>
+                </div>
+                <div className="bg-white/5 border border-white/10 rounded-2xl p-4 text-center">
+                  <div className="text-2xl font-bold text-green-400 mb-1">98.5%</div>
+                  <div className="text-white/60 text-sm">Accuracy Rate</div>
+                </div>
+                <div className="bg-white/5 border border-white/10 rounded-2xl p-4 text-center">
+                  <div className="text-2xl font-bold text-blue-400 mb-1">
+                    {recordings.reduce((total, r) => {
+                      const [mins, secs] = r.duration.split(':').map(Number);
+                      return total + mins + (secs / 60);
+                    }, 0).toFixed(1)}m
+                  </div>
+                  <div className="text-white/60 text-sm">Total Duration</div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'history' && (
+            <div className="max-w-4xl mx-auto">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-bold text-white">Recording History</h2>
+                <Button variant="outline" className="border-white/20 text-white hover:bg-white/10">
+                  Export All
+                </Button>
+              </div>
 
               <div className="space-y-4">
                 {recordings.map((recording) => (
-                  <div key={recording.id} className="bg-white/5 border border-white/10 rounded-xl p-4 hover:bg-white/10 transition-colors">
-                    <div className="flex justify-between items-start mb-3">
+                  <div key={recording.id} className="bg-white/5 border border-white/10 rounded-xl p-6 hover:bg-white/10 transition-colors">
+                    <div className="flex justify-between items-start mb-4">
                       <div className="flex-1">
-                        <h3 className="font-medium text-white mb-1">{recording.name}</h3>
-                        <div className="flex items-center gap-4 text-sm text-white/60">
-                          <span className="flex items-center gap-1">
-                            <FileAudio className="w-3 h-3" />
+                        <h3 className="text-lg font-medium text-white mb-2">{recording.name}</h3>
+                        <div className="flex items-center gap-6 text-sm text-white/60">
+                          <span className="flex items-center gap-2">
+                            <FileAudio className="w-4 h-4" />
                             {recording.duration}
                           </span>
                           <span>{recording.timestamp}</span>
-                          <span className={`px-2 py-1 rounded-full text-xs ${
+                          <span className={`px-3 py-1 rounded-full text-xs ${
                             recording.status === 'completed' ? 'bg-green-500/20 text-green-400' :
                             recording.status === 'processing' ? 'bg-yellow-500/20 text-yellow-400' :
                             'bg-red-500/20 text-red-400'
@@ -360,48 +415,155 @@ export default function Dashboard() {
                           onClick={() => copyTranscript(recording.transcript, recording.id)}
                           variant="outline"
                           size="sm"
-                          className="w-8 h-8 p-0 border-white/20 text-white hover:bg-white/10"
+                          className="border-white/20 text-white hover:bg-white/10"
                         >
                           {copiedId === recording.id ? (
-                            <Check className="w-3 h-3 text-green-400" />
+                            <Check className="w-4 h-4 text-green-400" />
                           ) : (
-                            <Copy className="w-3 h-3" />
+                            <Copy className="w-4 h-4" />
                           )}
                         </Button>
                         <Button
                           variant="outline"
                           size="sm"
-                          className="w-8 h-8 p-0 border-white/20 text-white hover:bg-white/10"
+                          className="border-white/20 text-white hover:bg-white/10"
                         >
-                          <Download className="w-3 h-3" />
+                          <Download className="w-4 h-4" />
                         </Button>
                         <Button
                           onClick={() => deleteRecording(recording.id)}
                           variant="outline"
                           size="sm"
-                          className="w-8 h-8 p-0 border-red-500/20 text-red-400 hover:bg-red-500/10"
+                          className="border-red-500/20 text-red-400 hover:bg-red-500/10"
                         >
-                          <Trash2 className="w-3 h-3" />
+                          <Trash2 className="w-4 h-4" />
                         </Button>
                       </div>
                     </div>
                     
-                    <div className="bg-white/5 rounded-lg p-3">
-                      <p className="text-white/90 text-sm leading-relaxed line-clamp-2">
-                        {recording.transcript}
-                      </p>
+                    <div className="bg-white/5 rounded-lg p-4">
+                      <p className="text-white/90 leading-relaxed">{recording.transcript}</p>
                     </div>
                   </div>
                 ))}
               </div>
+            </div>
+          )}
 
-              <Button variant="outline" className="w-full mt-4 border-white/20 text-white hover:bg-white/10">
-                View All Recordings
+          {activeTab === 'overview' && (
+            <div className="max-w-4xl mx-auto">
+              <h2 className="text-2xl font-bold text-white mb-6">Dashboard Overview</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
+                  <h3 className="text-lg font-semibold text-white mb-4">Recent Activity</h3>
+                  <div className="space-y-3">
+                    {recordings.slice(0, 3).map((recording) => (
+                      <div key={recording.id} className="flex items-center gap-3 text-sm">
+                        <div className="w-2 h-2 bg-[#0db2f3] rounded-full"></div>
+                        <span className="text-white/80">{recording.name}</span>
+                        <span className="text-white/60">{recording.timestamp}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                
+                <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
+                  <h3 className="text-lg font-semibold text-white mb-4">Quick Actions</h3>
+                  <div className="space-y-3">
+                    <Button 
+                      onClick={() => setActiveTab('record')}
+                      className="w-full bg-gradient-to-r from-[#0db2f3] to-blue-500 justify-start"
+                    >
+                      <Mic className="w-4 h-4 mr-2" />
+                      Start New Recording
+                    </Button>
+                    <Button 
+                      onClick={() => setShowUploadModal(true)}
+                      variant="outline" 
+                      className="w-full border-white/20 text-white hover:bg-white/10 justify-start"
+                    >
+                      <Upload className="w-4 h-4 mr-2" />
+                      Upload Audio File
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'settings' && (
+            <div className="max-w-2xl mx-auto">
+              <h2 className="text-2xl font-bold text-white mb-6">Settings</h2>
+              <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="text-lg font-semibold text-white mb-3">Recording Preferences</h3>
+                    <div className="space-y-3">
+                      <label className="flex items-center justify-between">
+                        <span className="text-white/80">Auto-save recordings</span>
+                        <input type="checkbox" className="rounded" defaultChecked />
+                      </label>
+                      <label className="flex items-center justify-between">
+                        <span className="text-white/80">Real-time transcription</span>
+                        <input type="checkbox" className="rounded" defaultChecked />
+                      </label>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <h3 className="text-lg font-semibold text-white mb-3">Language Settings</h3>
+                    <select className="w-full p-3 bg-white/10 border border-white/20 rounded-lg text-white">
+                      <option value="en-ng">Nigerian English</option>
+                      <option value="pcm">Nigerian Pidgin</option>
+                      <option value="en-us">American English</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </main>
+      </div>
+
+      {/* Upload Modal */}
+      {showUploadModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-[#0a0b0f] border border-white/10 rounded-2xl p-6 w-full max-w-md">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-xl font-semibold text-white">Upload Audio File</h3>
+              <Button
+                onClick={() => setShowUploadModal(false)}
+                variant="outline"
+                size="sm"
+                className="border-white/20 text-white hover:bg-white/10"
+              >
+                <X className="w-4 h-4" />
               </Button>
+            </div>
+            
+            <div className="border-2 border-dashed border-white/20 rounded-xl p-8 text-center hover:border-[#0db2f3]/50 transition-colors">
+              <Upload className="w-12 h-12 text-white/60 mx-auto mb-4" />
+              <p className="text-white/80 mb-2">Drop your audio file here or click to browse</p>
+              <p className="text-white/60 text-sm mb-4">Supports MP3, WAV, M4A (Max 100MB)</p>
+              
+              <input
+                type="file"
+                accept="audio/*"
+                onChange={handleFileUpload}
+                className="hidden"
+                id="audio-upload"
+              />
+              <label
+                htmlFor="audio-upload"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#0db2f3] to-blue-500 text-white rounded-lg cursor-pointer hover:from-[#0db2f3]/80 hover:to-blue-500/80 transition-all"
+              >
+                <FileAudio className="w-4 h-4" />
+                Choose File
+              </label>
             </div>
           </div>
         </div>
-      </main>
+      )}
     </div>
-  )
+  );
 }

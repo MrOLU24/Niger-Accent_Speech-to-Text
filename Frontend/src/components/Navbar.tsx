@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useTheme } from 'next-themes';
 import { usePathname } from 'next/navigation';
-import { Sun, Moon, Menu, X, Mic, Brain } from 'lucide-react';
+import { Sun, Moon, Menu, X, Mic } from 'lucide-react';
 import { Button } from './ui/button';
 import LoadingLink from './LoadingLink';
 

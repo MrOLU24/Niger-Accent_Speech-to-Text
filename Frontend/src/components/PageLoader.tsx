@@ -1,7 +1,7 @@
 "use client";
 
 import { useLoading } from "./LoadingProvider";
-import { Mic, Brain, Zap, Loader2 } from "lucide-react";
+import { Mic, Zap, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 
 export default function PageLoader() {

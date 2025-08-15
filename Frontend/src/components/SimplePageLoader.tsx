@@ -12,7 +12,7 @@ export default function SimplePageLoader() {
     // Override the router.push method to show loading
     const originalPush = router.push;
     
-    router.push = (href: string, options?: any) => {
+    router.push = (href: string, options?: Record<string, unknown>) => {
       // Only show loading for different routes
       if (href !== window.location.pathname) {
         setIsLoading(true);

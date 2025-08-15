@@ -1,7 +1,6 @@
 "use client";
 
-import Image from "next/image";
-import { Star, ChevronLeft, ChevronRight } from "lucide-react";
+import { Star } from "lucide-react";
 import { useRef, useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 
@@ -96,81 +95,6 @@ export default function TestimonialsSection() {
   useEffect(() => {
     setIsClient(true);
   }, []);
-
-  const testimonials = [
-    {
-      name: "Adebayo Johnson",
-      role: "Podcast Host & Content Creator",
-      content:
-        "ToriType revolutionized my workflow. It perfectly captures my Lagos accent and even understands when I switch to Pidgin mid-conversation. The accuracy is incredible!",
-      avatar: "adebayo",
-      rating: 5,
-      gradient: "from-[#0db2f3] to-blue-500",
-    },
-    {
-      name: "Fatima Ibrahim",
-      role: "Journalist, Premium Times",
-      content:
-        "As a journalist covering diverse communities, I need transcription that understands context. ToriType's cultural intelligence is unmatched—it gets the nuances that others miss.",
-      avatar: "fatima",
-      rating: 5,
-      gradient: "from-blue-500 to-[#0db2f3]",
-    },
-    {
-      name: "Chinedu Okafor",
-      role: "YouTube Creator, 2M+ subscribers",
-      content:
-        "From interviews to vlogs, ToriType handles everything. The real-time transcription during live streams is a game-changer. My audience loves the instant captions!",
-      avatar: "chinedu",
-      rating: 5,
-      gradient: "from-[#0db2f3] to-blue-600",
-    },
-    {
-      name: "Amina Hassan",
-      role: "Radio Host, Arewa FM",
-      content:
-        "Finally, an AI that understands Hausa-English code-switching! ToriType has transformed how I prepare show notes and transcripts. It's like having a multilingual assistant.",
-      avatar: "amina",
-      rating: 5,
-      gradient: "from-blue-600 to-[#0db2f3]",
-    },
-    {
-      name: "Kemi Adeleke",
-      role: "Documentary Filmmaker",
-      content:
-        "Interviewing elders in rural communities, their stories are precious. ToriType captures every word, every pause, every emotion. It's preserving our heritage digitally.",
-      avatar: "kemi",
-      rating: 5,
-      gradient: "from-[#0db2f3] to-blue-500",
-    },
-    {
-      name: "Ibrahim Musa",
-      role: "University Lecturer",
-      content:
-        "For academic research on Nigerian linguistics, ToriType is invaluable. It handles complex phonetic variations and regional dialects better than any other tool I've used.",
-      avatar: "ibrahim",
-      rating: 5,
-      gradient: "from-blue-500 to-[#0db2f3]",
-    },
-    {
-      name: "Blessing Okoro",
-      role: "Corporate Trainer",
-      content:
-        "Training sessions with mixed Nigerian audiences require precision. ToriType captures every accent perfectly, making my training materials accessible to everyone.",
-      avatar: "blessing",
-      rating: 5,
-      gradient: "from-[#0db2f3] to-blue-600",
-    },
-    {
-      name: "Samuel Adebisi",
-      role: "Tech Entrepreneur",
-      content:
-        "Building products for the Nigerian market means understanding local nuances. ToriType's API integration has been seamless and the accuracy is consistently above 98%.",
-      avatar: "samuel",
-      rating: 5,
-      gradient: "from-blue-600 to-[#0db2f3]",
-    },
-  ];
 
   return (
     <section
