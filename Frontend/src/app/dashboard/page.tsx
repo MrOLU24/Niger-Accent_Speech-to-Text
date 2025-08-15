@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { createClient } from '../../lib/supabase/client';
 import { useRouter } from 'next/navigation';
+import { useTheme } from 'next-themes';
 import { Button } from '../../components/ui/button';
 import Image from 'next/image';
 import { 
@@ -21,7 +22,10 @@ import {
   Copy,
   Check,
   Plus,
-  X
+  X,
+  Sun,
+  Moon,
+  Menu
 } from 'lucide-react';
 
 interface User {
@@ -50,6 +54,9 @@ export default function Dashboard() {
   const [currentTranscript, setCurrentTranscript] = useState('');
   const [activeTab, setActiveTab] = useState('record');
   const [showUploadModal, setShowUploadModal] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const { resolvedTheme, setTheme } = useTheme();
   const [recordings, setRecordings] = useState<Recording[]>([
     {
       id: '1',
@@ -87,6 +94,10 @@ export default function Dashboard() {
   useEffect(() => {
     getUser();
   }, [getUser]);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (isRecording && !isPaused) {
@@ -202,18 +213,54 @@ export default function Dashboard() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-[#0e0f16] flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-[#0e0f16] flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#0db2f3]"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#0e0f16] flex">
+    <div className="min-h-screen bg-gray-50 dark:bg-[#0e0f16] flex">
+      {/* Mobile Menu Button */}
+      <div className="lg:hidden fixed top-4 left-4 z-50">
+        <Button
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+          variant="outline"
+          size="sm"
+          className="bg-white dark:bg-[#0a0b0f] border-gray-300 dark:border-white/10 text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-white/10"
+        >
+          <Menu className="w-4 h-4" />
+        </Button>
+      </div>
+
+      {/* Mobile Overlay */}
+      {sidebarOpen && (
+        <div 
+          className="lg:hidden fixed inset-0 bg-black/50 z-40"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
       {/* Left Sidebar */}
-      <div className="w-64 bg-[#0a0b0f] border-r border-white/10 flex flex-col">
+      <div className={`
+        w-64 bg-white dark:bg-[#0a0b0f] border-r border-gray-200 dark:border-white/10 flex flex-col
+        lg:relative lg:translate-x-0
+        fixed inset-y-0 left-0 z-50 transform transition-transform duration-300 ease-in-out
+        ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+      `}>
+        {/* Close Button for Mobile */}
+        <div className="lg:hidden p-4 flex justify-end">
+          <Button
+            onClick={() => setSidebarOpen(false)}
+            variant="outline"
+            size="sm"
+            className="bg-gray-100 dark:bg-white/5 border-gray-300 dark:border-white/10 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-white/10"
+          >
+            <X className="w-4 h-4" />
+          </Button>
+        </div>
         {/* Logo */}
-        <div className="p-6 border-b border-white/10">
+        <div className="p-6 border-b border-gray-200 dark:border-white/10">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-gradient-to-r from-[#0db2f3] to-blue-500 rounded-xl flex items-center justify-center">
               <Mic className="w-5 h-5 text-white" />
@@ -222,7 +269,7 @@ export default function Dashboard() {
               <h1 className="text-xl font-bold bg-gradient-to-r from-[#0db2f3] to-blue-400 bg-clip-text text-transparent">
                 ToriType
               </h1>
-              <p className="text-xs text-white/60">Nigerian AI Platform</p>
+              <p className="text-xs text-gray-500 dark:text-white/60">Nigerian AI Platform</p>
             </div>
           </div>
         </div>
@@ -239,7 +286,7 @@ export default function Dashboard() {
                   className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 ${
                     activeTab === item.id
                       ? 'bg-[#0db2f3]/20 text-[#0db2f3] border border-[#0db2f3]/30'
-                      : 'text-white/70 hover:text-white hover:bg-white/5'
+                      : 'text-gray-600 dark:text-white/70 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/5'
                   }`}
                 >
                   <Icon className="w-5 h-5" />
@@ -251,8 +298,8 @@ export default function Dashboard() {
         </nav>
 
         {/* User Profile & Sign Out */}
-        <div className="p-4 border-t border-white/10">
-          <div className="flex items-center gap-3 mb-4 p-3 bg-white/5 rounded-xl">
+        <div className="p-4 border-t border-gray-200 dark:border-white/10">
+          <div className="flex items-center gap-3 mb-4 p-3 bg-gray-100 dark:bg-white/5 rounded-xl">
             <Image
               src={user?.user_metadata?.avatar_url || '/default-avatar.png'}
               alt="Profile"
@@ -261,12 +308,36 @@ export default function Dashboard() {
               className="w-10 h-10 rounded-full border-2 border-[#0db2f3]/30"
             />
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-white truncate">
+              <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
                 {user?.user_metadata?.full_name || user?.email}
               </p>
-              <p className="text-xs text-white/60 truncate">{user?.email}</p>
+              <p className="text-xs text-gray-600 dark:text-white/60 truncate">{user?.email}</p>
             </div>
           </div>
+          
+          {/* Theme Toggle */}
+          {mounted && (
+            <div className="mb-4">
+              <Button
+                onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
+                variant="outline"
+                className="w-full bg-gray-100 dark:bg-white/5 border-gray-300 dark:border-white/10 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-white/10 hover:border-gray-400 dark:hover:border-white/20"
+              >
+                {resolvedTheme === 'dark' ? (
+                  <>
+                    <Sun className="w-4 h-4 mr-2" />
+                    Light Mode
+                  </>
+                ) : (
+                  <>
+                    <Moon className="w-4 h-4 mr-2" />
+                    Dark Mode
+                  </>
+                )}
+              </Button>
+            </div>
+          )}
+          
           <Button
             onClick={handleSignOut}
             variant="outline"
@@ -279,22 +350,22 @@ export default function Dashboard() {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col lg:ml-0">
         {/* Content Area */}
-        <main className="flex-1 p-8">
+        <main className="flex-1 p-4 lg:p-8 pt-16 lg:pt-8">
           {activeTab === 'record' && (
             <div className="max-w-4xl mx-auto">
               <div className="text-center mb-8">
-                <h2 className="text-3xl font-bold text-white mb-2">Voice Recording Studio</h2>
-                <p className="text-white/60">Record your voice and get instant Nigerian-English transcriptions</p>
+                <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Voice Recording Studio</h2>
+                <p className="text-gray-600 dark:text-white/60">Record your voice and get instant Nigerian-English transcriptions</p>
               </div>
 
               {/* Recording Interface */}
-              <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-3xl p-8 mb-8">
+              <div className="bg-white/80 dark:bg-white/5 backdrop-blur-sm border border-gray-200 dark:border-white/10 rounded-3xl p-8 mb-8">
                 <div className="text-center space-y-8">
                   {/* Timer */}
                   <div>
-                    <div className="text-6xl font-mono font-bold text-white mb-2">
+                    <div className="text-6xl font-mono font-bold text-gray-900 dark:text-white mb-2">
                       {formatTime(recordingTime)}
                     </div>
                     {isRecording && (
