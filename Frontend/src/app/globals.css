@@ -1,6 +1,7 @@
 @import "tailwindcss";
 /* Tailwind v4: enable class-based dark mode on self or ancestor */
 @custom-variant dark (&:where(.dark, .dark *));
+@custom-variant light (&:where(.light, .light *));
 
 @theme {
   /* Preferred sans-serif stack */
@@ -25,6 +26,40 @@
   --color-card: hsl(var(--card));
   --color-card-foreground: hsl(var(--card-foreground));
   --radius: 0.5rem;
+  
+  /* Custom colors for the project */
+  --color-brand-blue: #0db2f3;
+  --color-brand-dark: #0e0f16;
+  
+  /* Custom animations */
+  --animate-shimmer: shimmer 2s linear infinite;
+  --animate-float: float 6s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.animate-shimmer {
+  animation: shimmer 2s linear infinite;
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
 }
 
 :root {
@@ -113,6 +148,11 @@ html {
 }
 
 body {
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+body {
   background-color: var(--color-background);
   color: var(--color-foreground);
   font-feature-settings: "rlig" 1, "calt" 1;
@@ -184,4 +224,37 @@ body {
 .dark .glass {
   background: color-mix(in oklab, black 20%, transparent);
   border: 1px solid color-mix(in oklab, white 10%, transparent);
+}
+
+/* Custom animations for hero section */
+@keyframes data-flow {
+  0% { opacity: 0; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(0.8); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { 
+    box-shadow: 0 0 5px rgba(13, 178, 243, 0.3);
+  }
+  50% { 
+    box-shadow: 0 0 20px rgba(13, 178, 243, 0.6), 0 0 30px rgba(13, 178, 243, 0.4);
+  }
+}
+
+@keyframes border-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.animate-data-flow {
+  animation: data-flow 2s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.animate-border-spin {
+  animation: border-spin 6s linear infinite;
 }

@@ -1,0 +1,27 @@
+/* Swiper CSS Imports */
+@import 'swiper/css';
+@import 'swiper/css/navigation';
+@import 'swiper/css/pagination';
+
+/* Custom Swiper Styles */
+.testimonials-swiper .swiper-pagination {
+  bottom: 0 !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  width: auto !important;
+}
+
+.testimonials-swiper .swiper-pagination-bullet {
+  transition: all 0.3s ease !important;
+  opacity: 0.7 !important;
+}
+
+.testimonials-swiper .swiper-pagination-bullet-active {
+  transform: scale(1.2) !important;
+  opacity: 1 !important;
+}
+
+.testimonials-swiper .swiper-pagination-bullet:hover {
+  opacity: 1 !important;
+  transform: scale(1.1) !important;
+}
