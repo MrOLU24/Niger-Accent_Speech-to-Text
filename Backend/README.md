@@ -13,7 +13,7 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install fastapi uvicorn transformers datasets accelerate torch
 
 # Run development server
-uvicorn main:app --reload
+uvicorn app.main:app --reload
 ```
 
 ## Key Components to Implement
