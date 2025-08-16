@@ -1,29 +1,30 @@
-from typing import Any
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
-from api.transcription.routes import router as transcription_router
+from contextlib import asynccontextmanager
 
+from app.api.transcription.routes import router as transcription_router
+from app.core.db import connect_to_mongo, close_mongo_connection
 
+# Lifespan handler
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    await connect_to_mongo()       
+    yield
+    await close_mongo_connection() 
 
-# -----------------------------
-# FastAPI App Initialization
-# -----------------------------
 app = FastAPI(
     title="ToriType API",
     description="Nigerian English & Pidgin Speech-to-text API",
     version="1.0.0",
+    lifespan=lifespan
 )
 
-# -----------------------------
-# API Router Registration
-# -----------------------------
+# Include router
 app.include_router(transcription_router)
 
-# -----------------------------
-# Root Endpoint
-# -----------------------------
+# Root endpoint
 @app.get("/", response_class=HTMLResponse)
-async def home() -> Any:
+async def home():
     return """
     <html>
         <head>
