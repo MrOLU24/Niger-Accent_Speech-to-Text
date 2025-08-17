@@ -143,3 +143,8 @@ Thumbs.db
 
 # FastAPI logs (if you keep logs)
 logs/
+
+# ML datasets and models
+ml/datasets/
+*.arrow
+*.parquet
