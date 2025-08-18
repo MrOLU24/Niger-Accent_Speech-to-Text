@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import Navbar from "../components/Navbar";
 import { ThemeProvider } from "../components/ThemeProvider";
 import SimplePageLoader from "../components/SimplePageLoader";
+import ConditionalNavbar from "../components/ConditionalNavbar";
 
 export const metadata: Metadata = {
   title: "ToriType | Nigerian Speech-to-Text AI Platform",
@@ -24,7 +24,7 @@ export default function RootLayout({
           storageKey="toritype-theme"
         >
           <SimplePageLoader />
-          <Navbar />
+          <ConditionalNavbar />
           {children}
         </ThemeProvider>
       </body>
