@@ -4,6 +4,8 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { createClient } from '../../lib/supabase/client';
 import { useRouter } from 'next/navigation';
 import { User } from '@supabase/supabase-js';
+import { Menu } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import Sidebar from '@/components/dashboard/Sidebar';
 import TranscriptionDisplay from '@/components/dashboard/TranscriptionDisplay';
 import ControlPanel from '@/components/dashboard/ControlPanel';
@@ -412,6 +414,26 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-[#0e0f16] flex">
+      {/* Mobile Menu Button */}
+      <div className="lg:hidden fixed top-4 left-4 z-50">
+        <Button
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+          variant="outline"
+          size="sm"
+          className="bg-white dark:bg-[#0a0b0f] border-gray-300 dark:border-white/10 text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-white/10"
+        >
+          <Menu className="w-4 h-4" />
+        </Button>
+      </div>
+
+      {/* Mobile Overlay */}
+      {sidebarOpen && (
+        <div 
+          className="lg:hidden fixed inset-0 bg-black/50 z-40"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
       <Sidebar
         user={user}
