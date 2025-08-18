@@ -48,8 +48,8 @@ export default function TranscriptionDisplay({
 }: TranscriptionDisplayProps) {
 
   return (
-    <div className="flex-1 min-h-0 bg-white/80 dark:bg-white/5 backdrop-blur-sm border border-gray-200 dark:border-white/10 rounded-2xl p-4 sm:p-6 mb-4 sm:mb-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-3">
+    <div className="flex-1 bg-white/80 dark:bg-white/5 backdrop-blur-sm border border-gray-200 dark:border-white/10 rounded-2xl p-4 sm:p-6 flex flex-col">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-3 flex-shrink-0">
         <div className="flex items-center gap-3">
           <h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white">Transcription</h2>
           
@@ -68,7 +68,7 @@ export default function TranscriptionDisplay({
           </div>
         </div>
         
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center justify-end gap-2">
           <Button
             onClick={handleCopyText}
             variant="outline"
@@ -140,11 +140,11 @@ export default function TranscriptionDisplay({
           ref={textareaRef}
           value={editableText}
           onChange={(e) => setEditableText(e.target.value)}
-          className="w-full h-full min-h-[300px] sm:min-h-[400px] p-4 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white resize-none focus:ring-2 focus:ring-[#0db2f3] focus:border-[#0db2f3] outline-none"
+          className="flex-1 min-h-[300px] sm:min-h-[400px] p-4 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white resize-none focus:ring-2 focus:ring-[#0db2f3] focus:border-[#0db2f3] outline-none"
           placeholder="Your transcription will appear here..."
         />
       ) : (
-        <div className="h-full min-h-[300px] sm:min-h-[400px] p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg overflow-y-auto relative">
+        <div className="flex-1 min-h-[300px] sm:min-h-[400px] p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg overflow-y-auto relative">
           {isProcessing && (
             <div className="absolute inset-0 bg-white/80 dark:bg-gray-800/80 flex items-center justify-center backdrop-blur-sm rounded-lg">
               <div className="flex items-center gap-3">

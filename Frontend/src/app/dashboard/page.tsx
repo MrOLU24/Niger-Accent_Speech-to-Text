@@ -444,9 +444,9 @@ export default function Dashboard() {
       />
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col lg:ml-0">
-        <main className="flex-1 p-4 lg:p-8 pt-16 lg:pt-8 flex flex-col">
-          <div className="max-w-6xl mx-auto h-full flex flex-col gap-6">
+      <div className="flex-1 flex flex-col">
+        <main className="flex-1 p-4 lg:p-8 pt-20 lg:pt-8 flex flex-col">
+          <div className="max-w-6xl mx-auto w-full h-full flex flex-col gap-6">
             
             {/* Transcription Display */}
             <TranscriptionDisplay
