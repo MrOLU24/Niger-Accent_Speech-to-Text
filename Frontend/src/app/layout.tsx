@@ -1,8 +1,15 @@
 import type { Metadata } from "next";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "../components/ThemeProvider";
 import SimplePageLoader from "../components/SimplePageLoader";
 import ConditionalNavbar from "../components/ConditionalNavbar";
+
+const inter = Inter({ 
+  subsets: ["latin"],
+  variable: "--font-inter",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "ToriType | Nigerian Speech-to-Text AI Platform",
@@ -16,7 +23,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning className="scroll-smooth">
-      <body className="font-sans antialiased bg-[#0e0f16] text-white">
+      <body className={`${inter.variable} font-sans antialiased bg-[#0e0f16] text-white`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"

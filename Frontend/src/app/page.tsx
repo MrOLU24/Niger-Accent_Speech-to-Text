@@ -7,6 +7,7 @@ import {
   FeaturesSection,
   TestimonialsSection,
   CTASection,
+  Footer,
 } from "@/components/sections";
 
 export default function LandingPage() {
@@ -18,6 +19,7 @@ export default function LandingPage() {
       <FeaturesSection />
       <TestimonialsSection />
       <CTASection />
+      <Footer />
     </div>
   );
 }
