@@ -7,7 +7,7 @@ export default function AboutSection() {
   const featuresRef = useRef<HTMLDivElement>(null);
   const demoRef = useRef<HTMLDivElement>(null);
 
-  // Interactive demo state
+  // Demo state
   const [currentDemoIndex, setCurrentDemoIndex] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
   const [isClient, setIsClient] = useState(false);
@@ -40,12 +40,12 @@ export default function AboutSection() {
     },
   ];
 
-  // Check if we're on the client side
+  // Client-side check
   useEffect(() => {
     setIsClient(true);
   }, []);
 
-  // Auto-cycle through demo messages - only on client side
+  // Auto-cycle demo messages
   useEffect(() => {
     if (!isClient) return;
 
@@ -270,7 +270,7 @@ export default function AboutSection() {
       id="about"
       className="py-12 md:py-16 lg:py-24 bg-gradient-to-br from-[#0e0f16] via-[#0e0f16]/95 to-[#0e0f16] dark:from-[#0e0f16] dark:via-[#0e0f16]/95 dark:to-[#0e0f16] light:from-white light:via-gray-50 light:to-white relative overflow-hidden"
     >
-      {/* Background Elements */}
+  {/* Background visuals */}
       <div className="absolute inset-0 bg-gradient-to-br from-[#0db2f3]/5 via-transparent to-blue-500/5"></div>
       <div className="absolute top-20 right-10 w-72 h-72 bg-[#0db2f3]/10 rounded-full blur-3xl animate-pulse"></div>
       <div className="absolute bottom-20 left-10 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
@@ -291,19 +291,19 @@ export default function AboutSection() {
         </div>
 
         <div className="grid lg:grid-cols-2 gap-8 md:gap-12 lg:gap-16 items-center">
-          {/* Features - Professional Layout */}
+          {/* Features */}
           <div ref={featuresRef} className="space-y-8 md:space-y-12">
             {features.map((feature, i) => (
               <div
                 key={i}
                 className="group flex gap-4 md:gap-6 items-start hover:scale-[1.02] transition-all duration-500"
               >
-                {/* Custom Illustration */}
+                {/* Illustration */}
                 <div className="flex-shrink-0 group-hover:scale-110 transition-transform duration-500">
                   {feature.illustration}
                 </div>
 
-                {/* Content */}
+                {/* Feature content */}
                 <div className="flex-1">
                   <h3 className="text-xl md:text-2xl font-bold text-white dark:text-white light:text-gray-900 mb-3 group-hover:text-[#0db2f3] transition-colors duration-300">
                     {feature.title}
@@ -316,10 +316,10 @@ export default function AboutSection() {
             ))}
           </div>
 
-          {/* Interactive Demo */}
+          {/* Demo UI */}
           <div ref={demoRef} className="relative">
             <div className="space-y-6 p-6 md:p-8 bg-gradient-to-br from-white/5 to-white/10 dark:from-white/5 dark:to-white/10 light:from-white/80 light:to-white/90 rounded-3xl border border-[#0db2f3]/20 backdrop-blur-sm hover:shadow-2xl hover:shadow-[#0db2f3]/20 transition-all duration-500">
-              {/* Header */}
+              {/* Demo header */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3 text-[#0db2f3]">
                   <div className="w-3 h-3 rounded-full bg-[#0db2f3] animate-pulse"></div>
@@ -331,7 +331,7 @@ export default function AboutSection() {
                 </div>
               </div>
 
-              {/* Interactive Message Display */}
+              {/* Demo message display */}
               <div className="relative min-h-[200px] space-y-4">
                 {isClient ? (
                   demoMessages.map((message, index) => (
@@ -352,7 +352,7 @@ export default function AboutSection() {
                         top: index === currentDemoIndex ? "auto" : "0",
                       }}
                     >
-                      {/* Original Speech */}
+                      {/* Original speech */}
                       <div className="bg-gradient-to-r from-[#0db2f3]/20 to-blue-500/20 p-4 rounded-2xl border-l-4 border-[#0db2f3]">
                         <p className="text-white dark:text-white light:text-gray-900 font-medium">
                           &ldquo;{message.text}&rdquo;
@@ -381,7 +381,7 @@ export default function AboutSection() {
                     </div>
                   ))
                 ) : (
-                  // Fallback for SSR - show first message without animations
+                  // SSR fallback: show first message
                   <div className="transform translate-y-0 opacity-100">
                     <div className="bg-gradient-to-r from-[#0db2f3]/20 to-blue-500/20 p-4 rounded-2xl border-l-4 border-[#0db2f3]">
                       <p className="text-white dark:text-white light:text-gray-900 font-medium">
@@ -402,7 +402,7 @@ export default function AboutSection() {
                 )}
               </div>
 
-              {/* Processing Stats */}
+              {/* Stats */}
               <div className="flex items-center justify-between text-sm">
                 <div className="flex items-center gap-2 text-gray-300 dark:text-gray-300 light:text-gray-600">
                   <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
@@ -419,7 +419,7 @@ export default function AboutSection() {
                 </div>
               </div>
 
-              {/* Progress Indicator */}
+              {/* Progress bar */}
               <div className="flex items-center gap-1">
                 {demoMessages.map((_, index) => (
                   <div

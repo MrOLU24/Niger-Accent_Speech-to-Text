@@ -4,13 +4,13 @@ import { Star } from "lucide-react";
 import { useRef, useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 
-// Dynamically import Swiper with no SSR
+// Swiper: no SSR
 const SwiperComponent = dynamic(() => import("./SwiperTestimonials"), {
   ssr: false,
   loading: () => <TestimonialsFallback />,
 });
 
-// Fallback component for SSR and loading
+// SSR/loading fallback
 function TestimonialsFallback() {
   const testimonials = [
     {
@@ -49,7 +49,7 @@ function TestimonialsFallback() {
           key={i}
           className="group h-full p-8 bg-white dark:bg-gray-800/50 rounded-3xl shadow-lg border border-gray-200 dark:border-gray-700 transition-all duration-500 backdrop-blur-sm"
         >
-          {/* Rating Stars */}
+          {/* Stars */}
           <div className="flex items-center gap-1 mb-6">
             {[...Array(testimonial.rating)].map((_, starIndex) => (
               <Star
@@ -64,7 +64,7 @@ function TestimonialsFallback() {
             &ldquo;{testimonial.content}&rdquo;
           </p>
 
-          {/* Avatar & User Info */}
+          {/* Avatar & user info */}
           <div className="flex items-center gap-4">
             <div className="w-14 h-14 rounded-full bg-gradient-to-r from-[#0db2f3] to-blue-500 flex items-center justify-center text-white font-bold text-base shadow-lg">
               {testimonial.name

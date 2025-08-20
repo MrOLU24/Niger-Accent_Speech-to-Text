@@ -33,12 +33,12 @@ export default function RecordingControls({
 
   return (
     <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-      {/* Timer */}
+  {/* Recording timer */}
       <div className="text-xl sm:text-2xl font-mono font-bold text-gray-900 dark:text-white">
         {formatTime(recordingTime)}
       </div>
 
-      {/* Recording Button */}
+  {/* Record/pause/stop buttons */}
       {!isRecording ? (
         <Button
           onClick={startRecording}
@@ -65,7 +65,7 @@ export default function RecordingControls({
         </div>
       )}
 
-      {/* Status */}
+  {/* Recording status */}
       {isRecording && (
         <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-600 dark:text-gray-400">
           <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>

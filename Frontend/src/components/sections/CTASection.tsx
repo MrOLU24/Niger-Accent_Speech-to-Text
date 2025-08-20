@@ -10,12 +10,12 @@ export default function CTASection() {
       ref={containerRef}
       className="py-12 md:py-16 lg:py-24 bg-gradient-to-br from-[#0e0f16] via-[#0e0f16]/95 to-[#0e0f16] dark:from-[#0e0f16] dark:via-[#0e0f16]/95 dark:to-[#0e0f16] light:from-white light:via-gray-50 light:to-white relative overflow-hidden"
     >
-      {/* Background Elements */}
+  {/* Background visuals */}
       <div className="absolute inset-0 bg-gradient-to-br from-[#0db2f3]/10 via-transparent to-blue-500/10"></div>
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-[#0db2f3]/20 rounded-full blur-3xl animate-pulse"></div>
       
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        {/* Clean, borderless CTA */}
+  {/* CTA card */}
         <div className="text-center max-w-4xl mx-auto">
           <h3 className="text-2xl md:text-3xl lg:text-5xl font-bold text-white dark:text-white light:text-gray-900 mb-4 md:mb-6">
             Ready to transform your{" "}
@@ -28,7 +28,7 @@ export default function CTASection() {
             culturally-aware transcription. Start your free trial today.
           </p>
           
-          {/* Action Buttons */}
+          {/* Actions */}
           <div className="flex flex-col sm:flex-row gap-4 md:gap-6 justify-center items-center">
             <LoadingLink 
               href="/login"

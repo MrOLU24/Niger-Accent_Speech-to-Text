@@ -35,20 +35,20 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-[#0e0f16] dark:bg-[#0e0f16] light:bg-gradient-to-br light:from-gray-50 light:to-blue-50 relative overflow-hidden">
-      {/* Background Elements - matching hero section style */}
+  {/* Background visuals */}
       <div className="absolute inset-0">
-        {/* Gradient overlays */}
+  {/* Gradients */}
         <div className="absolute inset-0 bg-gradient-to-br from-[#0db2f3]/5 via-transparent to-blue-500/5"></div>
         
-        {/* Floating orbs - responsive positioning */}
+  {/* Animated orbs */}
         <div className="absolute top-1/4 left-1/6 sm:left-1/4 w-48 h-48 sm:w-64 sm:h-64 bg-[#0db2f3]/10 rounded-full blur-3xl animate-pulse"></div>
         <div className="absolute bottom-1/3 right-1/6 sm:right-1/4 w-56 h-56 sm:w-80 sm:h-80 bg-blue-500/8 rounded-full blur-3xl animate-pulse delay-1000"></div>
         
-        {/* Grid pattern - responsive size */}
+  {/* Grid pattern */}
         <div className="absolute inset-0 bg-[linear-gradient(rgba(13,178,243,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(13,178,243,0.03)_1px,transparent_1px)] bg-[size:30px_30px] sm:bg-[size:50px_50px]"></div>
       </div>
 
-      {/* Back navigation */}
+  {/* Back button */}
       <div className="absolute top-4 left-4 sm:top-6 sm:left-6 z-20">
         <LoadingLink 
           href="/"
@@ -59,19 +59,19 @@ export default function LoginPage() {
         </LoadingLink>
       </div>
 
-      {/* Main content */}
+  {/* Main login UI */}
       <div className="relative z-10 min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 py-8">
         <div className="w-full max-w-sm sm:max-w-md">
           {/* Login card */}
           <div className="bg-white/5 dark:bg-white/5 light:bg-white/80 backdrop-blur-sm border border-white/10 dark:border-white/10 light:border-gray-200 rounded-2xl sm:rounded-3xl p-6 sm:p-8 lg:p-10 shadow-2xl shadow-black/20 dark:shadow-black/20 light:shadow-gray-200/20">
             
-            {/* Header */}
+            {/* Card header */}
             <div className="text-center mb-6 sm:mb-8">
               {/* Logo */}
               <div className="inline-flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
                 <div className="relative w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-r from-[#0db2f3] to-blue-500 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg shadow-[#0db2f3]/30">
                   <Mic className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
-                  {/* Pulse effect */}
+                  {/* Logo pulse */}
                   <div className="absolute inset-0 bg-gradient-to-r from-[#0db2f3] to-blue-500 rounded-xl sm:rounded-2xl opacity-20 animate-ping"></div>
                 </div>
                 <div className="text-left">
@@ -91,9 +91,9 @@ export default function LoginPage() {
               </div>
             </div>
 
-            {/* Sign in section */}
+            {/* Sign in */}
             <div className="space-y-4 sm:space-y-6">
-              {/* Primary Google button */}
+              {/* Google sign-in */}
               <Button
                 onClick={handleGoogleSignIn}
                 disabled={isLoading}
@@ -130,7 +130,7 @@ export default function LoginPage() {
                 </div>
               </div>
 
-              {/* Alternative options */}
+              {/* Other sign-in options */}
               <div className="grid grid-cols-2 gap-3 sm:gap-4">
                 <Button
                   variant="outline"
@@ -151,7 +151,7 @@ export default function LoginPage() {
               </div>
             </div>
 
-            {/* Terms and privacy */}
+            {/* Terms & privacy */}
             <div className="mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-white/10 dark:border-white/10 light:border-gray-200">
               <p className="text-xs sm:text-sm text-white/60 dark:text-white/60 light:text-gray-500 text-center leading-relaxed">
                 By signing in, you agree to our{" "}
@@ -166,7 +166,7 @@ export default function LoginPage() {
             </div>
           </div>
 
-          {/* Bottom link */}
+          {/* Explore link */}
           <div className="text-center mt-4 sm:mt-6">
             <p className="text-white/60 dark:text-white/60 light:text-gray-500 text-sm">
               New to ToriType?{" "}
