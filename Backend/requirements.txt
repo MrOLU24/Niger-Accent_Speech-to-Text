@@ -1,4 +1,5 @@
 accelerate==1.10.0
+openai-whisper==20240930
 aiofiles==24.1.0
 aiohappyeyeballs==2.6.1
 aiohttp==3.12.15

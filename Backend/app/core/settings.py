@@ -7,9 +7,9 @@ class Settings(BaseSettings):
     MONGO_DB_NAME: str
     MONGO_COLLECTION_NAME: str
 
-    # OpenAI
-    OPENAI_API_KEY: str
-    USE_OPENAI_MOCK: bool = True
+    # OpenAI (only required if USE_OPENAI_MOCK=True)
+    OPENAI_API_KEY: str | None = None
+    USE_OPENAI_MOCK: bool = False
 
 
     # Auth / JWT

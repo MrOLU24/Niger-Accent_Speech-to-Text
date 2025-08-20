@@ -72,17 +72,54 @@ def extract_pidgin_corrections(analysis):
     """Extract potential Pidgin to English corrections from analysis."""
     corrections = {}
     
-    # Common Pidgin words found in the dataset
+    # Common Pidgin words found in the dataset (expanded based on real data)
     pidgin_mappings = {
-        # These will be extracted from actual dataset patterns
-        'wetin': 'what',
+        # Core dataset words (top frequency)
+        'di': 'the',
         'dey': 'are',
+        'wey': 'that',
+        'dem': 'them',
         'go': 'will',
         'na': 'is',
+        'wetin': 'what',
         'fit': 'can',
+        'tok': 'talk',
+        'say': 'said',
+        'wen': 'when',
+        'how': 'how',
+        'make': 'let',
+        'come': 'come',
+        'no': 'not',
+        'don': 'have',
+        'get': 'have',
+        'see': 'see',
+        'know': 'know',
+        'want': 'want',
+        'like': 'like',
+        'think': 'think',
+        'good': 'good',
+        'bad': 'bad',
+        'small': 'small',
+        'big': 'big',
+        # Traditional additions
         'chop': 'eat',
         'waka': 'walk',
         'yarn': 'talk',
+        'sabi': 'know',
+        'oya': 'come on',
+        'abeg': 'please',
+        'wahala': 'problem',
+        'palava': 'trouble',
+        'katakata': 'chaos',
+        'gbege': 'problem',
+        'shey': 'right',
+        'abi': 'right',
+        'comot': 'leave',
+        'enter': 'come in',
+        'carry': 'take',
+        'drop': 'put down',
+        'find': 'look for',
+        'hear': 'listen',
     }
     
     # Analyze word frequencies to find Pidgin patterns
