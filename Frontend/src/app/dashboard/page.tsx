@@ -52,7 +52,7 @@ export default function Dashboard() {
   useEffect(() => {
     setMounted(true);
     
-    // Test API connection on component mount
+    // Check API health on mount
     const testAPI = async () => {
       try {
         setApiStatus('connecting');
@@ -101,17 +101,17 @@ export default function Dashboard() {
     setTranscriptText(isRecording ? 'Processing recorded audio...' : 'Processing uploaded audio file...');
     
     try {
-      // Create FormData for multipart/form-data payload
+    // Prepare audio for upload
       const formData = new FormData();
       
-      // Add the audio data to the form
+    // Attach audio data
       if (isRecording) {
         formData.append('audio', audioData, 'recording.webm');
       } else {
         formData.append('audio', audioData);
       }
       
-      // Send fetch request to the /transcribe API endpoint
+    // POST audio to backend
       const response = await fetch('/api/transcribe', {
         method: 'POST',
         body: formData,
@@ -125,7 +125,7 @@ export default function Dashboard() {
       
       const result = await response.json();
       
-      // Display the transcribed text from the API response
+    // Show transcription result
       if (result.transcription || result.text) {
         const transcription = result.transcription || result.text;
         setTranscriptText(transcription);
@@ -134,7 +134,7 @@ export default function Dashboard() {
         throw new Error('No transcription received from API');
       }
       
-      // Update filename for uploads
+    // Save uploaded filename
       if (!isRecording && audioData instanceof File) {
         setUploadedFileName(audioData.name);
       }
@@ -143,7 +143,7 @@ export default function Dashboard() {
       console.error('Error sending audio to API:', error);
       setApiStatus('error');
       
-      // Fallback to mock transcription for development/demo
+    // Use mock transcription if API fails
       console.log('Falling back to mock transcription...');
       await new Promise(resolve => setTimeout(resolve, 1500));
       
@@ -238,7 +238,7 @@ export default function Dashboard() {
     
     if (file) {
       // Validate file type
-      const validTypes = ['audio/mp3', 'audio/wav', 'audio/m4a', 'audio/mpeg', 'audio/webm', 'audio/ogg'];
+      const validTypes = ['audio/mp3', 'audio/wav', 'audio/m4a', 'audio/mpeg', 'audio/webm', 'audio/ogg']; // Allowed audio formats
       console.log('File type:', file.type);
       
       if (!validTypes.includes(file.type)) {
@@ -258,7 +258,7 @@ export default function Dashboard() {
     }
     
     // Reset input
-    event.target.value = '';
+    event.target.value = ''; // Clear file input
   };
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -322,41 +322,30 @@ export default function Dashboard() {
       const mediaRecorder = new MediaRecorder(stream, options);
       mediaRecorderRef.current = mediaRecorder;
       
-      // Reset audio chunks for new recording
+      // Prepare audio chunks
       const chunks: Blob[] = [];
-      
-      // Handle data available event
       mediaRecorder.ondataavailable = (event) => {
         if (event.data.size > 0) {
           chunks.push(event.data);
         }
       };
-      
-      // Handle recording stop event
+      // On stop: save, send, release mic
       mediaRecorder.onstop = () => {
-        // Create blob from recorded chunks
-        const audioBlob = new Blob(chunks, { type: options.mimeType });
+        const audioBlob = new Blob(chunks, { type: options.mimeType }); // Save audio blob
         setAudioBlob(audioBlob);
-        
-        // Send audio to API for transcription
-        processAudioBlob(audioBlob);
-        
-        // Stop all media tracks to release microphone
-        stream.getTracks().forEach(track => track.stop());
+        processAudioBlob(audioBlob); // Transcribe audio
+        stream.getTracks().forEach(track => track.stop()); // Release microphone
       };
-      
-      // Update UI state
+      // Update recording state
       setIsRecording(true);
       setIsPaused(false);
       setRecordingTime(0);
       setTranscriptText('🎤 Recording started... Speak clearly for best results!');
-      
-      // Start recording (collect data every 100ms for smoother processing)
+      // Start recording
       mediaRecorder.start(100);
       
     } catch (err) {
       console.error('Error accessing microphone:', err);
-      
       let errorMessage = 'Could not start recording. ';
       if (err instanceof Error) {
         if (err.name === 'NotAllowedError') {
@@ -369,7 +358,6 @@ export default function Dashboard() {
       } else {
         errorMessage += 'Please check your microphone and try again.';
       }
-      
       alert(errorMessage);
       setTranscriptText('Unable to start recording. Please check microphone permissions.');
     }
@@ -415,7 +403,7 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-[#0e0f16] flex">
       {/* Mobile Menu Button */}
-      <div className="lg:hidden fixed top-4 left-4 z-50">
+    <div className="lg:hidden fixed top-4 left-4 z-50"> {/* Mobile menu */}
         <Button
           onClick={() => setSidebarOpen(!sidebarOpen)}
           variant="outline"

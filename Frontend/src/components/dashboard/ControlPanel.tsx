@@ -49,7 +49,7 @@ export default function ControlPanel({
 }: ControlPanelProps) {
   return (
     <div className="bg-white/80 dark:bg-white/5 backdrop-blur-sm border border-gray-200 dark:border-white/10 rounded-2xl p-4 sm:p-6">
-      {/* Mode Toggle */}
+  {/* Mode toggle */}
       <div className="flex flex-col lg:flex-row lg:items-center gap-6">
         <div className="flex items-center justify-center">
           <div className="flex items-center gap-2 bg-gray-100 dark:bg-gray-800 rounded-xl p-1">
@@ -89,7 +89,7 @@ export default function ControlPanel({
           </div>
         </div>
 
-        {/* Recording Controls */}
+  {/* Recording controls */}
         {activeMode === 'record' && (
           <RecordingControls
             isRecording={isRecording}
@@ -101,7 +101,7 @@ export default function ControlPanel({
           />
         )}
 
-        {/* Chat Interface */}
+  {/* Chat interface */}
         {activeMode === 'chat' && (
           <div className="flex items-center justify-center">
             <div className="text-gray-600 dark:text-gray-400 text-center">
@@ -110,7 +110,7 @@ export default function ControlPanel({
           </div>
         )}
 
-        {/* Upload Interface */}
+  {/* Upload interface */}
         {activeMode === 'upload' && (
           <UploadInterface
             isDragOver={isDragOver}
@@ -125,7 +125,7 @@ export default function ControlPanel({
         )}
       </div>
       
-      {/* Hidden file input for uploads */}
+  {/* Hidden file input */}
       <input
         type="file"
         accept="audio/*"

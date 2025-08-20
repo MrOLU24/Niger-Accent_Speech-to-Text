@@ -5,7 +5,7 @@ import { Star, ChevronLeft, ChevronRight } from "lucide-react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination, Autoplay } from "swiper/modules";
 
-// Import Swiper styles
+// Swiper styles
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
@@ -127,7 +127,7 @@ export default function SwiperTestimonials() {
           {testimonials.map((testimonial, i) => (
             <SwiperSlide key={i}>
               <div className="group h-full p-8 bg-white dark:bg-gray-800/50 rounded-3xl shadow-lg hover:shadow-2xl border border-gray-200 dark:border-gray-700 hover:border-[#0db2f3]/30 transition-all duration-500 hover:scale-[1.02] backdrop-blur-sm">
-                {/* Rating Stars */}
+                {/* Stars */}
                 <div className="flex items-center gap-1 mb-6">
                   {[...Array(testimonial.rating)].map((_, starIndex) => (
                     <Star
@@ -143,7 +143,7 @@ export default function SwiperTestimonials() {
                   &ldquo;{testimonial.content}&rdquo;
                 </p>
 
-                {/* Avatar & User Info */}
+                {/* Avatar & user info */}
                 <div className="flex items-center gap-4">
                   <div className="relative w-14 h-14 group-hover:scale-110 transition-transform duration-300">
                     <Image
@@ -154,7 +154,7 @@ export default function SwiperTestimonials() {
                       className="w-14 h-14 rounded-full object-cover shadow-lg border-3 border-[#0db2f3]/30 group-hover:border-[#0db2f3]/60 transition-all duration-300"
                       unoptimized
                       onError={(e) => {
-                        // Fallback to gradient avatar if image fails to load
+                        // Gradient avatar fallback
                         const target = e.currentTarget as HTMLImageElement;
                         const fallback =
                           target.nextElementSibling as HTMLElement | null;
@@ -164,7 +164,7 @@ export default function SwiperTestimonials() {
                         }
                       }}
                     />
-                    {/* Fallback gradient avatar */}
+                    {/* Gradient avatar */}
                     <div
                       className={`absolute inset-0 w-14 h-14 rounded-full bg-gradient-to-r ${testimonial.gradient} items-center justify-center text-white font-bold text-base border-3 border-[#0db2f3]/30 group-hover:border-[#0db2f3]/60 shadow-lg`}
                       style={{ display: "none" }}
@@ -186,14 +186,14 @@ export default function SwiperTestimonials() {
                   </div>
                 </div>
 
-                {/* Hover glow effect */}
+                {/* Hover glow */}
                 <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-[#0db2f3]/5 to-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
               </div>
             </SwiperSlide>
           ))}
         </Swiper>
 
-        {/* Custom Navigation Arrows */}
+  {/* Navigation arrows */}
         <button className="testimonial-prev absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 md:-translate-x-6 z-20 w-14 h-14 rounded-full bg-white dark:bg-gray-800 border-2 border-[#0db2f3]/30 shadow-xl flex items-center justify-center hover:bg-[#0db2f3] hover:border-[#0db2f3] hover:scale-110 transition-all duration-300 group">
           <ChevronLeft className="w-6 h-6 text-[#0db2f3] group-hover:text-white transition-colors duration-300" />
         </button>
@@ -203,7 +203,7 @@ export default function SwiperTestimonials() {
         </button>
       </div>
 
-      {/* Custom Pagination Styles */}
+  {/* Pagination styles */}
       <style jsx global>{`
         .testimonials-swiper .swiper-pagination {
           bottom: 0 !important;

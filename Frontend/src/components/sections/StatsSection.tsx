@@ -30,14 +30,14 @@ export default function StatsSection() {
       ref={containerRef}
       className="py-12 md:py-16 lg:py-24 relative overflow-hidden"
     >
-      {/* Background Elements */}
+  {/* Background visuals */}
       <div className="absolute inset-0 bg-gradient-to-br from-[#0e0f16] via-[#0e0f16]/95 to-[#0e0f16] dark:from-[#0e0f16] dark:via-[#0e0f16]/95 dark:to-[#0e0f16] light:from-white light:via-gray-50 light:to-white"></div>
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_40%,rgba(13,178,243,0.1),transparent_70%)]"></div>
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_60%,rgba(59,130,246,0.1),transparent_70%)]"></div>
 
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex justify-center">
-          {/* Users Section - Centered */}
+          {/* Users section */}
           <div ref={avatarsRef} className="text-center max-w-2xl">
             <div className="mb-6">
               <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white dark:text-white light:text-gray-900 mb-3">
@@ -52,7 +52,7 @@ export default function StatsSection() {
               </p>
             </div>
 
-            {/* Avatar Stack */}
+            {/* Avatars */}
             <div className="flex justify-center items-center gap-2 mb-6">
               <div className="flex -space-x-3">
                 {userAvatars.map((user, index) => (

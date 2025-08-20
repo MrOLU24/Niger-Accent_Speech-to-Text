@@ -53,7 +53,7 @@ export default function TranscriptionDisplay({
         <div className="flex items-center gap-3">
           <h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white">Transcription</h2>
           
-          {/* API Status Indicator */}
+          {/* API status */}
           <div className="flex items-center gap-2">
             <div className={`w-2 h-2 rounded-full ${
               apiStatus === 'connected' ? 'bg-green-500' :
