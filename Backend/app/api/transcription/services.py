@@ -33,14 +33,15 @@ class TranscriptionService:
             result = self.model.transcribe(str(file_path))
             raw_text = result["text"]
             
-            # Process for Nigerian Pidgin improvements
+            # Process to preserve authentic Nigerian Pidgin
             pidgin_confidence = self.pidgin_processor.get_pidgin_confidence(raw_text)
             
-            # Apply corrections if Pidgin is detected (confidence > 0.3)
-            if pidgin_confidence > 0.3:
-                text = self.pidgin_processor.process_text(raw_text, apply_corrections=True)
+            # Always preserve Pidgin expressions without converting to English
+            if pidgin_confidence > 0.2:  # Lower threshold for better detection
+                text = self.pidgin_processor.process_text(raw_text, preserve_pidgin=True)
             else:
-                text = self.pidgin_processor.process_text(raw_text, apply_corrections=False)
+                # Still clean up the text but don't force Pidgin patterns
+                text = self.pidgin_processor.process_text(raw_text, preserve_pidgin=False)
             
             # Clean up temporary file
             try:
