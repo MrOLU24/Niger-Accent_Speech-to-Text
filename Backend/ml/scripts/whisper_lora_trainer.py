@@ -12,6 +12,8 @@ from dataclasses import dataclass
 from typing import Dict, List, Any, Optional
 
 from datasets import load_from_disk, DatasetDict, Audio
+import datasets
+datasets.disable_caching()
 
 # Configure environment to use librosa instead of torchcodec for audio decoding
 os.environ["HF_DATASETS_AUDIO_BACKEND"] = "librosa"
@@ -25,8 +27,22 @@ from transformers import (
     Seq2SeqTrainer,
     TrainerCallback
 )
+from transformers import DataCollatorForSeq2Seq
 from peft import LoraConfig, get_peft_model, TaskType
 import evaluate
+
+
+class CustomWhisperTrainer(Seq2SeqTrainer):
+    def compute_loss(self, model, inputs, return_outputs=False, num_items_in_batch=None):
+        labels = inputs.get("labels")
+        outputs = model(**inputs)
+        loss = outputs.loss
+
+        # Ensure loss requires gradients
+        if loss is not None:
+            loss = loss.requires_grad_(True)
+
+        return (loss, outputs) if return_outputs else loss
 
 
 @dataclass
@@ -38,7 +54,7 @@ class ModelArguments:
 
 @dataclass 
 class DataArguments:
-    dataset_name: str = "ml/datasets/combined_nigerian_speech"
+    dataset_name: str = "/kaggle/input/nigerian-pidgin-speech-dataset/combined_nigerian_speech"
     max_train_samples: Optional[int] = None
     max_eval_samples: Optional[int] = None
 
@@ -94,7 +110,6 @@ class WhisperLoRATrainer:
             ]
         
         lora_config = LoraConfig(
-            task_type=TaskType.FEATURE_EXTRACTION,
             r=self.lora_args.lora_r,
             lora_alpha=self.lora_args.lora_alpha,
             lora_dropout=self.lora_args.lora_dropout,
@@ -107,6 +122,11 @@ class WhisperLoRATrainer:
     def _load_and_prepare_dataset(self) -> DatasetDict:
         """Load and prepare combined Nigerian speech dataset (Pidgin + Common Voice)"""
         print(f"Loading combined dataset from {self.data_args.dataset_name}")
+        
+        # Clear any existing cache to force fresh processing
+        import datasets
+        datasets.disable_caching()
+        print("📧 Disabled dataset caching to force fresh processing")
         
         # Load dataset
         dataset = load_from_disk(self.data_args.dataset_name)
@@ -138,7 +158,12 @@ class WhisperLoRATrainer:
             self._preprocess_function,
             remove_columns=columns_to_remove,
             batched=True,
-            desc="Preprocessing combined Nigerian speech dataset"
+            desc="Preprocessing combined Nigerian speech dataset",
+            # Avoid writing cache files to read-only filesystem
+            keep_in_memory=True,
+            cache_file_names={
+                split: None for split in dataset.keys()
+            }
         )
         
         return dataset
@@ -179,14 +204,40 @@ class WhisperLoRATrainer:
         )
         
         # Process text - Preserve both Pidgin and Nigerian English as-is
-        with self.tokenizer.as_target_tokenizer():
-            # Use "text" column (standardized from either "sentence" or original "text")
-            labels = self.tokenizer(examples["text"]).input_ids
+        # Use "text" column (standardized from either "sentence" or original "text")  
+        labels = self.tokenizer(text_target=examples["text"]).input_ids
         
+        # Proper format for Whisper training
         batch = {
-            "input_features": inputs.input_features,
+            "input_features": [inputs.input_features[i].squeeze(0) for i in range(inputs.input_features.shape[0])],
             "labels": labels
         }
+        
+        return batch
+    
+    def _data_collator(self, features: List[Dict[str, Any]]) -> Dict[str, torch.Tensor]:
+        """Custom data collator for Whisper that handles input_features correctly"""
+        batch = {}
+        
+        # Handle input_features
+        if "input_features" in features[0]:
+            input_features = [torch.tensor(f["input_features"]) for f in features]
+            batch["input_features"] = torch.stack(input_features)
+        
+        # Handle labels with padding
+        if "labels" in features[0]:
+            labels = [torch.tensor(f["labels"]) for f in features]
+            # Pad labels to same length
+            max_len = max(len(label) for label in labels)
+            padded_labels = []
+            for label in labels:
+                padded = torch.nn.functional.pad(
+                    label, 
+                    (0, max_len - len(label)), 
+                    value=-100
+                )
+                padded_labels.append(padded)
+            batch["labels"] = torch.stack(padded_labels)
         
         return batch
     
@@ -206,37 +257,36 @@ class WhisperLoRATrainer:
         
         return {"wer": wer}
     
-    def train(self, output_dir: str = "models/whisper-pidgin-lora"):
+    def train(self, output_dir: str = "/kaggle/working/whisper-pidgin-lora"):
         """Train the model with LoRA"""
         training_args = Seq2SeqTrainingArguments(
             output_dir=output_dir,
-            per_device_train_batch_size=8,
-            gradient_accumulation_steps=2,
+            per_device_train_batch_size=4,  # Reduced batch size
+            gradient_accumulation_steps=4,  # Increased to maintain effective batch size
             learning_rate=1e-4,
-            warmup_steps=500,
-            max_steps=5000,
+            warmup_steps=100,
+            max_steps=2000,  # Reduced but still substantial
             gradient_checkpointing=True,
             fp16=True,
-            eval_strategy="steps",
-            eval_steps=500,
-            save_steps=500,
-            logging_steps=25,
-            report_to=None,
-            load_best_model_at_end=True,
-            metric_for_best_model="wer",
-            greater_is_better=False,
+            eval_strategy="no",  # Disable eval to save space
+            save_steps=1000,     # Less frequent saves to reduce disk usage
+            logging_steps=50,
+            report_to=[],        # Disable wandb/tensorboard logging
+            logging_dir=None,    # No separate logging directory
+            load_best_model_at_end=False,
             push_to_hub=False,
             dataloader_num_workers=0,
+            save_total_limit=1,  # Keep only 1 checkpoint to save space
         )
         
         trainer = Seq2SeqTrainer(
             args=training_args,
             model=self.model,
             train_dataset=self.dataset["train"],
-            eval_dataset=self.dataset["validation"],
-            data_collator=self._data_collator,
-            compute_metrics=self._compute_metrics,
-            tokenizer=self.processor.feature_extractor,
+            eval_dataset=None,  # No eval dataset to save space
+            data_collator=self._data_collator,  # Use custom Whisper collator
+            compute_metrics=None,  # Disable metrics for now
+            tokenizer=self.tokenizer,  # Use proper tokenizer
         )
         
         print("Starting LoRA fine-tuning...")
@@ -247,40 +297,12 @@ class WhisperLoRATrainer:
         print(f"LoRA adapter saved to {output_dir}")
         
         return trainer
-    
-    def _data_collator(self, features: List[Dict[str, Any]]) -> Dict[str, torch.Tensor]:
-        """Custom data collator for Whisper LoRA training"""
-        input_features = [{"input_features": feature["input_features"]} for feature in features]
-        
-        batch = self.processor.feature_extractor.pad(
-            input_features,
-            return_tensors="pt",
-        )
-        
-        # Get labels
-        label_features = [{"input_ids": feature["labels"]} for feature in features]
-        labels_batch = self.tokenizer.pad(
-            label_features,
-            return_tensors="pt",
-        )
-        
-        # Replace pad tokens with -100 for loss calculation
-        labels = labels_batch["input_ids"].masked_fill(
-            labels_batch.attention_mask.ne(1), -100
-        )
-        
-        # Cut off beginning token for decoder input
-        if (labels[:, 0] == self.tokenizer.bos_token_id).all().cpu().item():
-            labels = labels[:, 1:]
-        
-        batch["labels"] = labels
-        return batch
 
 
 class PidginModelInference:
     """Inference class for LoRA fine-tuned Whisper model"""
     
-    def __init__(self, base_model: str = "openai/whisper-small", lora_adapter_path: str = "models/whisper-pidgin-lora"):
+    def __init__(self, base_model: str = "openai/whisper-small", lora_adapter_path: str = "/kaggle/working/whisper-pidgin-lora"):
         self.base_model = base_model
         self.lora_adapter_path = lora_adapter_path
         
@@ -332,23 +354,78 @@ class PidginModelInference:
 
 
 def main():
-    """Main training function"""
-    # Configuration
-    model_args = ModelArguments()
-    data_args = DataArguments()
-    lora_args = LoRAArguments()
+    """Main training function for Kaggle"""
+    print("🇳🇬 Nigerian Speech-to-Text Training Pipeline (Kaggle)")
+    print("=" * 60)
     
-    # Create trainer
-    trainer = WhisperLoRATrainer(model_args, data_args, lora_args)
-    
-    # Train model
-    trained_model = trainer.train()
-    
-    print("Training completed!")
-    
-    # Test inference
-    inference = PidginModelInference()
-    print("Inference model ready for Nigerian Pidgin transcription")
+    # Clear any cached files from previous runs
+    print("🧹 Clearing any cached dataset files...")
+    try:
+        import shutil
+        cache_dirs = ["/kaggle/working/.cache", "/tmp/.cache", "~/.cache"]
+        for cache_dir in cache_dirs:
+            cache_path = os.path.expanduser(cache_dir)
+            if os.path.exists(cache_path):
+                shutil.rmtree(cache_path, ignore_errors=True)
+        print("✅ Cache cleared")
+    except:
+        print("⚠️ Cache clearing failed, continuing anyway")
+
+    # Configure training parameters
+    model_args = ModelArguments(
+        model_name_or_path="openai/whisper-small",
+        language="en",
+        task="transcribe"
+    )
+
+    data_args = DataArguments(
+        dataset_name="/kaggle/input/nigerian-pidgin-speech-dataset/combined_nigerian_speech",
+        max_train_samples=500,  # Reduced for Kaggle
+        max_eval_samples=100
+    )
+
+    lora_args = LoRAArguments(
+        lora_r=32,
+        lora_alpha=64,
+        lora_dropout=0.1,
+        lora_target_modules=[
+            "q_proj", "v_proj", "k_proj", "out_proj",
+            "fc1", "fc2"
+        ]
+    )
+
+    output_dir = "/kaggle/working/nigerian-whisper-lora"
+    os.makedirs(output_dir, exist_ok=True)
+
+    print(f"🤖 Base model: {model_args.model_name_or_path}")
+    print(f"📁 Dataset: {data_args.dataset_name}")
+    print(f"🎯 LoRA config: r={lora_args.lora_r}, alpha={lora_args.lora_alpha}")
+    print(f"💾 Output: {output_dir}")
+
+    try:
+        # Initialize trainer
+        print("\n🚀 Initializing trainer...")
+        trainer = WhisperLoRATrainer(model_args, data_args, lora_args)
+        print("✅ Trainer initialized successfully")
+
+        # Start training
+        print("\n🏋️ Starting LoRA fine-tuning...")
+        trained_model = trainer.train(output_dir=output_dir)
+
+        print("\n🎉 Training completed successfully!")
+        print(f"📄 LoRA adapter saved to: {output_dir}")
+
+        # Test the trained model
+        print("\n🧪 Testing trained model...")
+        inference = PidginModelInference(
+            base_model="openai/whisper-small",
+            lora_adapter_path=output_dir
+        )
+        print("✅ Nigerian Whisper model ready!")
+
+    except Exception as e:
+        print(f"❌ Training failed: {str(e)}")
+        raise
 
 
 if __name__ == "__main__":
