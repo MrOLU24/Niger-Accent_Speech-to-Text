@@ -148,3 +148,6 @@ logs/
 ml/datasets/
 *.arrow
 *.parquet
+nigerian_whisper_lora500/
+test_nigerian_whisper.py
+

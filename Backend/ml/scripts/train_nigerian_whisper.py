@@ -33,23 +33,26 @@ def main():
     
     model_args = ModelArguments(
         model_name_or_path="openai/whisper-small",  # Good balance of speed vs accuracy
-        language="en",  # English language model as base
+        language=None,  # Don't force specific language to allow Nigerian Pidgin
         task="transcribe"
     )
     
     data_args = DataArguments(
         dataset_name=combined_dataset_dir,
-        max_train_samples=2000,  # Good balance for initial training
-        max_eval_samples=400     # Proportional validation set
+        max_train_samples=5000,  # Increased to use more of the diverse dataset
+        max_eval_samples=800     # Proportional validation set
     )
     
     lora_args = LoRAArguments(
-        lora_r=32,           # LoRA rank - controls adaptation capacity
-        lora_alpha=64,       # LoRA scaling factor  
-        lora_dropout=0.1,    # Prevent overfitting
+        lora_r=64,           # Increased LoRA rank for better adaptation capacity
+        lora_alpha=128,      # Increased LoRA scaling factor  
+        lora_dropout=0.05,   # Reduced dropout for better learning
         lora_target_modules=[
-            "q_proj", "v_proj", "k_proj", "out_proj",  # Attention layers
-            "fc1", "fc2"                               # Feed-forward layers
+            # Core attention layers
+            "q_proj", "v_proj", "k_proj", "out_proj",
+            # Feed-forward layers
+            "fc1", "fc2"
+            # Note: Removed embeddings to save memory and avoid crashes
         ]
     )
     

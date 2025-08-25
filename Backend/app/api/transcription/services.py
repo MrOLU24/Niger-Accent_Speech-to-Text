@@ -11,8 +11,36 @@ import librosa
 from app.api.transcription.schemas import TranscriptionInDB
 from app.core.settings import settings
 from app.utils.pidgin_processor import PidginProcessor
+import ffmpeg
+
 
 USE_MOCK = getattr(settings, "USE_OPENAI_MOCK", False)  # Default to using Whisper
+
+
+async def convert_to_wav(file_path: Path) -> Path:
+    """Convert uploaded audio file to 16 kHz mono WAV."""
+    out_file = Path(tempfile.mktemp(suffix=".wav"))
+    
+    try:
+        (
+            ffmpeg
+            .input(str(file_path))
+            .output(str(out_file), ar=16000, ac=1, format='wav')
+            .run(overwrite_output=True, quiet=True)
+        )
+        print(f"✅ Successfully converted {file_path.name} to WAV format")
+        return out_file
+    
+    except ffmpeg.Error as e:
+        # Handle FFmpeg-specific errors
+        error_msg = e.stderr.decode() if e.stderr else str(e)
+        print(f"❌ FFmpeg conversion failed: {error_msg}")
+        raise RuntimeError(f"Audio conversion failed: {error_msg}")
+    
+    except Exception as e:
+        # Handle any other errors
+        print(f"❌ Unexpected error during conversion: {str(e)}")
+        raise RuntimeError(f"Audio conversion failed: {str(e)}")
 
 
 class TranscriptionService:
@@ -24,7 +52,7 @@ class TranscriptionService:
                 base_model = WhisperForConditionalGeneration.from_pretrained("openai/whisper-small")
                 self.model = PeftModel.from_pretrained(
                     base_model, 
-                    "/Users/mubarakojewale/Documents/Ravens/Niger-Accent_Speech-to-Text/Backend/whisper-pidgin-lora"
+                    "/Users/mubarakojewale/Documents/Ravens/Niger-Accent_Speech-to-Text/Backend/nigerian-whisper-lora-2k"
                 )
                 # Initialize processor without forcing English language
                 self.processor = WhisperProcessor.from_pretrained("openai/whisper-small")
@@ -47,46 +75,57 @@ class TranscriptionService:
     async def transcribe_audio(self, file_path: Path, filename: str) -> TranscriptionInDB:
         from app.core.db import audio_transcripts_collection  # dynamic import
 
-        # Handle mock or real Whisper transcription
-        if self.model is None:
-            text = f"Mock transcription for {filename} at {datetime.now(timezone.utc).isoformat()}"
-        else:
-            # Use appropriate model for transcription
-            if self.processor:  # Using finetuned HuggingFace model
-                # Load and preprocess audio
-                audio, _ = librosa.load(str(file_path), sr=16000)
-                inputs = self.processor(audio, sampling_rate=16000, return_tensors="pt")
-                
-                # Generate transcription with parameters that encourage Pidgin output
-                with torch.no_grad():
-                    predicted_ids = self.model.generate(
-                        inputs.input_features,
-                        forced_decoder_ids=None,  # Don't force any specific language tokens
-                        suppress_tokens=[],       # Don't suppress any tokens
-                        do_sample=True,          # Enable sampling for more natural output
-                        temperature=0.7,         # Slightly randomize to allow Pidgin expressions
-                        max_length=448,          # Standard Whisper max length
-                        num_beams=1              # Use greedy decoding for consistency
-                    )
-                
-                raw_text = self.processor.batch_decode(predicted_ids, skip_special_tokens=True)[0]
-            else:  # Fallback to original whisper
-                result = self.model.transcribe(str(file_path))
-                raw_text = result["text"]
-            
-            # Process to preserve authentic Nigerian Pidgin
-            pidgin_confidence = self.pidgin_processor.get_pidgin_confidence(raw_text)
-            
-            # Always preserve Pidgin expressions without converting to English
-            if pidgin_confidence > 0.2:  # Lower threshold for better detection
-                text = self.pidgin_processor.process_text(raw_text, preserve_pidgin=True)
+        # Convert audio to standardized WAV format first
+        wav_path = await convert_to_wav(file_path)
+        
+        try:
+            # Handle mock or real Whisper transcription
+            if self.model is None:
+                text = f"Mock transcription for {filename} at {datetime.now(timezone.utc).isoformat()}"
             else:
-                # Still clean up the text but don't force Pidgin patterns
-                text = self.pidgin_processor.process_text(raw_text, preserve_pidgin=False)
-            
-            # Clean up temporary file
+                # Use appropriate model for transcription
+                if self.processor:  # Using finetuned HuggingFace model
+                    # Load and preprocess audio from converted WAV
+                    audio, sr = librosa.load(str(wav_path), sr=16000)
+                    inputs = self.processor(audio, sampling_rate=16000, return_tensors="pt")
+                    
+                    # Generate transcription with parameters that encourage Pidgin output
+                    with torch.no_grad():
+                        predicted_ids = self.model.generate(
+                            inputs.input_features,
+                            forced_decoder_ids=None,  # Don't force any specific language tokens
+                            suppress_tokens=[],       # Don't suppress any tokens
+                            do_sample=True,          # Enable sampling for more natural output
+                            temperature=0.7,         # Slightly randomize to allow Pidgin expressions
+                            max_length=448,          # Standard Whisper max length
+                            num_beams=1              # Use greedy decoding for consistency
+                        )
+                    
+                    raw_text = self.processor.batch_decode(predicted_ids, skip_special_tokens=True)[0]
+                else:  # Fallback to original whisper
+                    # Use the converted WAV file for better compatibility
+                    result = self.model.transcribe(str(wav_path))
+                    raw_text = result["text"]
+                
+                # Process to preserve authentic Nigerian Pidgin
+                pidgin_confidence = self.pidgin_processor.get_pidgin_confidence(raw_text)
+                
+                # Always preserve Pidgin expressions without converting to English
+                if pidgin_confidence > 0.2:  # Lower threshold for better detection
+                    text = self.pidgin_processor.process_text(raw_text, preserve_pidgin=True)
+                else:
+                    # Still clean up the text but don't force Pidgin patterns
+                    text = self.pidgin_processor.process_text(raw_text, preserve_pidgin=False)
+        
+        finally:
+            # Clean up temporary files
             try:
-                os.unlink(file_path)
+                os.unlink(file_path)  # Original uploaded file
+            except:
+                pass
+            
+            try:
+                os.unlink(wav_path)   # Converted WAV file
             except:
                 pass
 

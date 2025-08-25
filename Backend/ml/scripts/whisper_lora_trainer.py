@@ -35,11 +35,16 @@ import evaluate
 class CustomWhisperTrainer(Seq2SeqTrainer):
     def compute_loss(self, model, inputs, return_outputs=False, num_items_in_batch=None):
         labels = inputs.get("labels")
+        
+        # Ensure input tensors have gradients enabled
+        if "input_features" in inputs:
+            inputs["input_features"] = inputs["input_features"].requires_grad_(True)
+        
         outputs = model(**inputs)
         loss = outputs.loss
 
-        # Ensure loss requires gradients
-        if loss is not None:
+        # Ensure loss requires gradients if it doesn't already
+        if loss is not None and not loss.requires_grad:
             loss = loss.requires_grad_(True)
 
         return (loss, outputs) if return_outputs else loss
@@ -48,7 +53,7 @@ class CustomWhisperTrainer(Seq2SeqTrainer):
 @dataclass
 class ModelArguments:
     model_name_or_path: str = "openai/whisper-small"
-    language: str = "en"
+    language: Optional[str] = None  # Don't force language to allow Nigerian Pidgin
     task: str = "transcribe"
 
 
@@ -61,9 +66,9 @@ class DataArguments:
 
 @dataclass
 class LoRAArguments:
-    lora_r: int = 32
-    lora_alpha: int = 64
-    lora_dropout: float = 0.1
+    lora_r: int = 64      # Increased default rank
+    lora_alpha: int = 128  # Increased default alpha
+    lora_dropout: float = 0.05  # Reduced for better learning
     lora_target_modules: List[str] = None
     
 
@@ -75,16 +80,28 @@ class WhisperLoRATrainer:
         
         # Initialize tokenizer and feature extractor
         self.feature_extractor = WhisperFeatureExtractor.from_pretrained(model_args.model_name_or_path)
-        self.tokenizer = WhisperTokenizer.from_pretrained(
-            model_args.model_name_or_path, 
-            language=model_args.language, 
-            task=model_args.task
-        )
-        self.processor = WhisperProcessor.from_pretrained(
-            model_args.model_name_or_path, 
-            language=model_args.language, 
-            task=model_args.task
-        )
+        # Initialize tokenizer without forcing language
+        if model_args.language:
+            self.tokenizer = WhisperTokenizer.from_pretrained(
+                model_args.model_name_or_path, 
+                language=model_args.language, 
+                task=model_args.task
+            )
+            self.processor = WhisperProcessor.from_pretrained(
+                model_args.model_name_or_path, 
+                language=model_args.language, 
+                task=model_args.task
+            )
+        else:
+            # No language forcing - allow model to detect Nigerian Pidgin naturally
+            self.tokenizer = WhisperTokenizer.from_pretrained(
+                model_args.model_name_or_path, 
+                task=model_args.task
+            )
+            self.processor = WhisperProcessor.from_pretrained(
+                model_args.model_name_or_path, 
+                task=model_args.task
+            )
         
         # Load model
         self.model = WhisperForConditionalGeneration.from_pretrained(model_args.model_name_or_path)
@@ -105,8 +122,11 @@ class WhisperLoRATrainer:
         # Default target modules for Whisper
         if self.lora_args.lora_target_modules is None:
             self.lora_args.lora_target_modules = [
+                # Core attention layers
                 "q_proj", "v_proj", "k_proj", "out_proj",
+                # Feed-forward layers
                 "fc1", "fc2"
+                # Note: Removed embeddings to save memory and avoid crashes
             ]
         
         lora_config = LoraConfig(
@@ -118,6 +138,19 @@ class WhisperLoRATrainer:
         
         self.model = get_peft_model(self.model, lora_config)
         print(f"LoRA applied to model. Trainable parameters: {self.model.print_trainable_parameters()}")
+        
+        # Ensure model is in training mode
+        self.model.train()
+        
+        # Verify gradients are enabled for LoRA params
+        lora_found = False
+        for name, param in self.model.named_parameters():
+            if param.requires_grad and 'lora' in name:
+                print(f"✅ LoRA param has gradients: {name}")
+                lora_found = True
+                break
+        if not lora_found:
+            print("❌ No LoRA parameters found with gradients!")
         
     def _load_and_prepare_dataset(self) -> DatasetDict:
         """Load and prepare combined Nigerian speech dataset (Pidgin + Common Voice)"""
@@ -261,16 +294,16 @@ class WhisperLoRATrainer:
         """Train the model with LoRA"""
         training_args = Seq2SeqTrainingArguments(
             output_dir=output_dir,
-            per_device_train_batch_size=4,  # Reduced batch size
-            gradient_accumulation_steps=4,  # Increased to maintain effective batch size
-            learning_rate=1e-4,
-            warmup_steps=100,
-            max_steps=2000,  # Reduced but still substantial
+            per_device_train_batch_size=2,  # Larger batch size for P100
+            gradient_accumulation_steps=8,   # Higher accumulation for effective batch 16
+            learning_rate=5e-4,  # Higher learning rate for better convergence
+            warmup_steps=100,                # Proper warmup for larger dataset
+            max_steps=1500,                  # More steps for larger dataset
             gradient_checkpointing=True,
             fp16=True,
             eval_strategy="no",  # Disable eval to save space
-            save_steps=1000,     # Less frequent saves to reduce disk usage
-            logging_steps=50,
+            save_steps=200,     # Save every 200 steps
+            logging_steps=25,    # Regular progress updates
             report_to=[],        # Disable wandb/tensorboard logging
             logging_dir=None,    # No separate logging directory
             load_best_model_at_end=False,
@@ -279,7 +312,7 @@ class WhisperLoRATrainer:
             save_total_limit=1,  # Keep only 1 checkpoint to save space
         )
         
-        trainer = Seq2SeqTrainer(
+        trainer = CustomWhisperTrainer(
             args=training_args,
             model=self.model,
             train_dataset=self.dataset["train"],
@@ -289,6 +322,26 @@ class WhisperLoRATrainer:
             tokenizer=self.tokenizer,  # Use proper tokenizer
         )
         
+        # Debug data flow before training
+        print("\n🔍 Testing data batch...")
+        try:
+            # Get a sample batch
+            sample_batch = next(iter(trainer.get_train_dataloader()))
+            
+            print("Batch keys:", sample_batch.keys())
+            print("Input features shape:", sample_batch['input_features'].shape)
+            print("Labels shape:", sample_batch['labels'].shape)
+            print("Input features requires_grad:", sample_batch['input_features'].requires_grad)
+            print("Labels requires_grad:", sample_batch['labels'].requires_grad)
+            
+            # Test forward pass (without no_grad to check gradients)
+            outputs = self.model(**sample_batch)
+            print("Forward pass successful, loss:", outputs.loss)
+            print("Loss has gradients:", outputs.loss.requires_grad)
+                
+        except Exception as e:
+            print(f"❌ Data flow error: {e}")
+
         print("Starting LoRA fine-tuning...")
         trainer.train()
         
@@ -373,22 +426,23 @@ def main():
 
     # Configure training parameters
     model_args = ModelArguments(
-        model_name_or_path="openai/whisper-small",
-        language="en",
+        model_name_or_path="openai/whisper-small",  # Back to small for better quality
+        language=None,  # Don't force English to allow Nigerian Pidgin
         task="transcribe"
     )
 
     data_args = DataArguments(
-        dataset_name="/kaggle/input/nigerian-pidgin-speech-dataset/combined_nigerian_speech",
-        max_train_samples=500,  # Reduced for Kaggle
-        max_eval_samples=100
+        dataset_name="/kaggle/input/combined-speech/combined_nigerian_speech",
+        max_train_samples=2000,  # Increased for better quality (P100 can handle this)
+        max_eval_samples=300     # Larger validation set
     )
 
     lora_args = LoRAArguments(
-        lora_r=32,
-        lora_alpha=64,
-        lora_dropout=0.1,
+        lora_r=64,           # High rank for maximum quality on P100
+        lora_alpha=128,      # Proportional to rank (2x)
+        lora_dropout=0.05,   # Keep same dropout
         lora_target_modules=[
+            # All 6 core modules for maximum adaptation
             "q_proj", "v_proj", "k_proj", "out_proj",
             "fc1", "fc2"
         ]

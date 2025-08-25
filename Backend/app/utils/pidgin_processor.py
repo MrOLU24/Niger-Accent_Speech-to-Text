@@ -15,6 +15,37 @@ class PidginProcessor:
     def __init__(self):
         self.pidgin_indicators = self._load_pidgin_indicators()
         self.common_patterns = self._load_patterns()
+        self.corrections = {
+            "waiting": "wetin",
+            "wala": "wahala",
+            "wallah": "wahala",
+            "shorty": "shotti",
+            "shotty": "shotti",
+            "surely": "shorle",
+            "show": "sho",
+            "damn": "dem",
+            "them": "dem",
+            "day": "dey",
+            "de": "dey",
+            "chow": "chop",
+            "job": "chop",
+            "sharp": "shap",
+            "palava": "wahala",
+            "plava": "wahala",
+            "brother": "broda",
+            "sister": "sista",
+            "mother": "mama",
+            "father": "papa",
+            "oga": "oga",
+            "guy": "guy",
+            "no wah la": "no wahala",
+            "wetting": "wetin",
+            "gon": "go",
+            "wan": "wan",
+            "one": "wan",
+            "naija": "naija",
+            "want": "wan",
+        }
     
     def _load_pidgin_indicators(self) -> set:
         """Load Nigerian Pidgin words to identify authentic Pidgin speech."""
@@ -98,6 +129,9 @@ class PidginProcessor:
         
         # Clean and normalize text
         processed = self._clean_text(text)
+
+        # Step 2: Apply word-level ASR corrections (e.g., 'chow' → 'chop')
+        processed = self._apply_corrections(processed)
         
         # Apply Pidgin pattern normalization (not conversion)
         if preserve_pidgin:
