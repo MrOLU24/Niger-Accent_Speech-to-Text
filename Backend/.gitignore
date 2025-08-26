@@ -149,5 +149,9 @@ ml/datasets/
 *.arrow
 *.parquet
 nigerian_whisper_lora500/
+
+
+#tests
+test_dataset_simple.py
 test_nigerian_whisper.py
 
