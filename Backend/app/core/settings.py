@@ -1,5 +1,5 @@
-
 from pydantic_settings import BaseSettings
+from pathlib import Path
 
 class Settings(BaseSettings):
     # MongoDB
@@ -21,3 +21,10 @@ class Settings(BaseSettings):
         env_file = ".env"  
 
 settings = Settings()
+
+class Config:
+        env_file = Path(__file__).resolve().parent.parent.parent / ".env"
+        env_file_encoding = "utf-8"
+
+settings = Settings()
+print("✅ Loaded settings from:", settings.model_dump())

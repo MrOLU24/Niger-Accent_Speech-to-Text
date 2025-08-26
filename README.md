@@ -1,84 +1,65 @@
-# ToriType - Nigerian English & Pidgin Speech-to-Text
 
-An inclusive and highly accurate speech-to-text platform specifically designed for Nigerian English and Pidgin speakers.
+# ToriType: Nigerian English & Pidgin Speech-to-Text Platform
 
-## 🎯 The Problem
-Standard speech-to-text models often struggle with Nigerian accents and Pidgin, leading to poor transcription quality for millions of speakers. ToriType addresses this gap with culturally-aware AI.
+ToriType is an inclusive, culturally-aware speech-to-text web application designed for Nigerian English and Pidgin speakers. It combines a modern Next.js frontend with a FastAPI backend powered by a fine-tuned Whisper model, delivering accurate transcriptions for local accents and dialects.
 
-## 💡 ToriType's Solution
-A machine learning platform that accurately transcribes Nigerian English and Pidgin without attempting to "correct" accents. Users can upload audio files or record directly through their browser for real-time transcription.
+## Project Overview
 
-## 🏗️ Project Structure
+Millions of Nigerians face poor transcription quality due to accent and dialect gaps in standard speech-to-text systems. ToriType solves this by:
+- Fine-tuning Whisper on Nigerian English and Pidgin datasets
+- Supporting browser-based recording and file uploads
+- Returning authentic, uncorrected transcriptions
 
-- **Frontend/**: Next.js + TypeScript application with browser recording
-- **Backend/**: FastAPI server with fine-tuned Whisper model
+## Features
 
-## 🚀 Getting Started
+- Audio recording via browser (MediaRecorder API)
+- Audio file upload (WAV, MP3, OGG, etc.)
+- Real-time transcription using a custom-trained Whisper model
+- Accurate support for Nigerian English and Pidgin
+- Culturally-accurate output (no forced accent correction)
 
-### Frontend (Next.js)
+## Technology Stack
+
+**Frontend:**
+- Next.js 14 (App Router)
+- TypeScript
+- Tailwind CSS
+- MediaRecorder API
+
+**Backend & ML:**
+- FastAPI (Python)
+- Uvicorn (ASGI server)
+- Whisper (OpenAI, fine-tuned with LoRA)
+- Hugging Face transformers, datasets, accelerate
+
+## Quick Start
+
+**Frontend:**
 ```bash
 cd Frontend
+npm install
 npm run dev
 ```
 
-### Backend (FastAPI)
+**Backend:**
 ```bash
 cd Backend
 pip install -r requirements.txt
 uvicorn main:app --reload
 ```
 
-## ✨ Key Features
+## Team Roles
 
-- [ ] **Audio Recording**: Browser-based microphone recording (MediaRecorder API)
-- [ ] **Audio Upload**: Support for common audio formats via file input
-- [ ] **Real-time Transcription**: Fine-tuned Whisper model API integration
-- [ ] **Nigerian English Support**: Accurate transcription of Nigerian accents
-- [ ] **Pidgin Language Support**: Specialized handling of Nigerian Pidgin
-- [ ] **Cultural Accuracy**: Preserves authentic language usage
+- Frontend Lead: UI/UX, recording, API integration
+- Backend/ML Engineer: FastAPI, Whisper fine-tuning, deployment
+- Data Specialist: Nigerian speech data collection/preprocessing
 
-## 🛠️ Technology Stack
+## Development Timeline
 
-### Frontend
-- **Framework**: Next.js 14 with App Router
-- **Language**: TypeScript
-- **Styling**: Tailwind CSS
-- **Recording**: MediaRecorder API
-- **Communication**: Fetch API for backend requests
+**Week 1:** Project setup, monorepo, basic UI, backend skeleton
+**Week 2:** Core features, ML fine-tuning, API integration
+**Week 3:** Real data testing, UI polish, optimization, documentation
 
-### Backend & ML
-- **Framework**: FastAPI
-- **Server**: Uvicorn (ASGI)
-- **Base Model**: OpenAI Whisper
-- **Fine-tuning**: Hugging Face transformers + datasets + accelerate
-- **Technique**: LoRA (Low-Rank Adaptation)
-- **Deployment**: Monorepo strategy
+## Expected Outcome
 
-## 👥 Team Roles
-
-- **Frontend Lead**: UI/UX, recording functionality, API integration
-- **Backend/ML Engineer**: FastAPI setup, Whisper fine-tuning, model deployment
-- **Data Specialist**: Nigerian speech data collection and preprocessing
-
-## 📅 3-Week Development Timeline
-
-### Week 1: Foundation
-- [x] Project setup and monorepo structure
-- [ ] Frontend: Basic UI with recording/upload components
-- [ ] Backend: FastAPI skeleton with file upload endpoints
-- [ ] ML: Whisper model setup and initial testing
-
-### Week 2: Core Development
-- [ ] Frontend: Complete recording and upload functionality
-- [ ] Backend: Audio processing pipeline
-- [ ] ML: Fine-tuning Whisper on Nigerian speech data
-- [ ] Integration: Connect frontend to backend API
-
-### Week 3: Polish & Deploy
-- [ ] Testing with real Nigerian speech samples
-- [ ] UI/UX improvements and error handling
-- [ ] Performance optimization
-- [ ] Documentation and demo preparation
-
-## 🎊 Expected Outcome
-A functional prototype demonstrating accurate transcription of Nigerian English and Pidgin, laying groundwork for an inclusive voice technology tool for the Nigerian community.
+A working prototype that accurately transcribes Nigerian English and Pidgin, ready for demo and further development as an inclusive voice technology for Nigeria.
