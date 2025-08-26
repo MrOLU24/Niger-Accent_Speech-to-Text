@@ -1,4 +1,6 @@
-from fastapi import APIRouter, HTTPException, UploadFile, File
+from fastapi import APIRouter, HTTPException, UploadFile, File, Depends
+from fastapi.security import OAuth2PasswordRequestForm
+from app.security import create_access_token
 from pathlib import Path
 import tempfile
 from app.api.transcription.services import TranscriptionService
@@ -28,3 +30,10 @@ async def get_transcription(transcription_id: str):
     if not doc:
         raise HTTPException(status_code=404, detail="Transcription not found")
     return TranscriptionResponse(id=str(doc.id), text=doc.text)
+
+@router.post("/token")
+async def login(form_data: OAuth2PasswordRequestForm = Depends()):
+    # For now, accept any username/password (replace with DB check later)
+    user_dict = {"sub": form_data.username}
+    token = create_access_token(user_dict)
+    return {"access_token": token, "token_type": "bearer"}
