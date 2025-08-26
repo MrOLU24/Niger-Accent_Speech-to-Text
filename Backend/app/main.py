@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
 from contextlib import asynccontextmanager
+from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.transcription.routes import router as transcription_router
 from app.core.db import connect_to_mongo, close_mongo_connection
@@ -36,3 +37,11 @@ async def home():
         </body>
     </html>
     """
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # change "*" to your frontend domain if known
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
