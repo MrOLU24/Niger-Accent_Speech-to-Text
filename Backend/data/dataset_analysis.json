@@ -1,0 +1,741 @@
+{
+  "word_freq": [
+    [
+      "di",
+      2944
+    ],
+    [
+      "for",
+      2566
+    ],
+    [
+      "dey",
+      2080
+    ],
+    [
+      "wey",
+      1865
+    ],
+    [
+      "say",
+      1832
+    ],
+    [
+      "dem",
+      1443
+    ],
+    [
+      "and",
+      1308
+    ],
+    [
+      "go",
+      1156
+    ],
+    [
+      "to",
+      1114
+    ],
+    [
+      "na",
+      1041
+    ],
+    [
+      "of",
+      1001
+    ],
+    [
+      "him",
+      943
+    ],
+    [
+      "no",
+      853
+    ],
+    [
+      "don",
+      843
+    ],
+    [
+      "be",
+      693
+    ],
+    [
+      "tok",
+      693
+    ],
+    [
+      "am",
+      646
+    ],
+    [
+      "pipo",
+      644
+    ],
+    [
+      "make",
+      571
+    ],
+    [
+      "hin",
+      566
+    ],
+    [
+      "one",
+      452
+    ],
+    [
+      "e",
+      439
+    ],
+    [
+      "as",
+      432
+    ],
+    [
+      "get",
+      417
+    ],
+    [
+      "dis",
+      404
+    ],
+    [
+      "do",
+      392
+    ],
+    [
+      "she",
+      347
+    ],
+    [
+      "on",
+      325
+    ],
+    [
+      "fit",
+      323
+    ],
+    [
+      "dia",
+      308
+    ],
+    [
+      "but",
+      308
+    ],
+    [
+      "com",
+      306
+    ],
+    [
+      "nigeria",
+      277
+    ],
+    [
+      "im",
+      273
+    ],
+    [
+      "we",
+      266
+    ],
+    [
+      "state",
+      259
+    ],
+    [
+      "from",
+      257
+    ],
+    [
+      "i",
+      248
+    ],
+    [
+      "you",
+      247
+    ],
+    [
+      "with",
+      223
+    ],
+    [
+      "see",
+      219
+    ],
+    [
+      "oga",
+      219
+    ],
+    [
+      "wetin",
+      211
+    ],
+    [
+      "like",
+      211
+    ],
+    [
+      "all",
+      204
+    ],
+    [
+      "her",
+      199
+    ],
+    [
+      "wen",
+      191
+    ],
+    [
+      "so",
+      182
+    ],
+    [
+      "dat",
+      179
+    ],
+    [
+      "give",
+      174
+    ],
+    [
+      "if",
+      167
+    ],
+    [
+      "afta",
+      163
+    ],
+    [
+      "some",
+      162
+    ],
+    [
+      "even",
+      160
+    ],
+    [
+      "govnor",
+      156
+    ],
+    [
+      "well",
+      155
+    ],
+    [
+      "wan",
+      155
+    ],
+    [
+      "becos",
+      154
+    ],
+    [
+      "buhari",
+      143
+    ],
+    [
+      "inside",
+      141
+    ],
+    [
+      "pikin",
+      135
+    ],
+    [
+      "tell",
+      133
+    ],
+    [
+      "before",
+      130
+    ],
+    [
+      "still",
+      130
+    ],
+    [
+      "hapun",
+      129
+    ],
+    [
+      "tori",
+      126
+    ],
+    [
+      "man",
+      125
+    ],
+    [
+      "use",
+      125
+    ],
+    [
+      "work",
+      124
+    ],
+    [
+      "president",
+      122
+    ],
+    [
+      "police",
+      121
+    ],
+    [
+      "or",
+      120
+    ],
+    [
+      "time",
+      120
+    ],
+    [
+      "enta",
+      119
+    ],
+    [
+      "person",
+      118
+    ],
+    [
+      "show",
+      115
+    ],
+    [
+      "take",
+      114
+    ],
+    [
+      "pass",
+      112
+    ],
+    [
+      "top",
+      112
+    ],
+    [
+      "years",
+      110
+    ],
+    [
+      "in",
+      110
+    ],
+    [
+      "about",
+      109
+    ],
+    [
+      "money",
+      107
+    ],
+    [
+      "carry",
+      107
+    ],
+    [
+      "how",
+      107
+    ],
+    [
+      "also",
+      106
+    ],
+    [
+      "first",
+      105
+    ],
+    [
+      "bin",
+      105
+    ],
+    [
+      "comot",
+      100
+    ],
+    [
+      "just",
+      100
+    ],
+    [
+      "play",
+      100
+    ],
+    [
+      "country",
+      99
+    ],
+    [
+      "con",
+      98
+    ],
+    [
+      "matter",
+      97
+    ],
+    [
+      "new",
+      96
+    ],
+    [
+      "year",
+      95
+    ],
+    [
+      "epp",
+      95
+    ],
+    [
+      "two",
+      92
+    ],
+    [
+      "tin",
+      92
+    ],
+    [
+      "party",
+      90
+    ]
+  ],
+  "bigram_freq": [
+    {
+      "bigram": "for di",
+      "count": 373
+    },
+    {
+      "bigram": "wey dey",
+      "count": 331
+    },
+    {
+      "bigram": "tok say",
+      "count": 320
+    },
+    {
+      "bigram": "of di",
+      "count": 230
+    },
+    {
+      "bigram": "wey be",
+      "count": 214
+    },
+    {
+      "bigram": "say na",
+      "count": 180
+    },
+    {
+      "bigram": "say dem",
+      "count": 175
+    },
+    {
+      "bigram": "wey dem",
+      "count": 172
+    },
+    {
+      "bigram": "say di",
+      "count": 160
+    },
+    {
+      "bigram": "say make",
+      "count": 157
+    },
+    {
+      "bigram": "pipo wey",
+      "count": 151
+    },
+    {
+      "bigram": "dem no",
+      "count": 128
+    },
+    {
+      "bigram": "dem dey",
+      "count": 127
+    },
+    {
+      "bigram": "dem go",
+      "count": 121
+    },
+    {
+      "bigram": "say him",
+      "count": 118
+    },
+    {
+      "bigram": "make dem",
+      "count": 110
+    },
+    {
+      "bigram": "no dey",
+      "count": 104
+    },
+    {
+      "bigram": "be di",
+      "count": 98
+    },
+    {
+      "bigram": "on top",
+      "count": 92
+    },
+    {
+      "bigram": "don dey",
+      "count": 90
+    },
+    {
+      "bigram": "no go",
+      "count": 90
+    },
+    {
+      "bigram": "dey do",
+      "count": 88
+    },
+    {
+      "bigram": "wey him",
+      "count": 85
+    },
+    {
+      "bigram": "na di",
+      "count": 84
+    },
+    {
+      "bigram": "be say",
+      "count": 80
+    },
+    {
+      "bigram": "no be",
+      "count": 77
+    },
+    {
+      "bigram": "according to",
+      "count": 72
+    },
+    {
+      "bigram": "wey go",
+      "count": 71
+    },
+    {
+      "bigram": "say hin",
+      "count": 69
+    },
+    {
+      "bigram": "and dem",
+      "count": 69
+    },
+    {
+      "bigram": "to di",
+      "count": 69
+    },
+    {
+      "bigram": "say e",
+      "count": 68
+    },
+    {
+      "bigram": "say she",
+      "count": 67
+    },
+    {
+      "bigram": "am for",
+      "count": 66
+    },
+    {
+      "bigram": "no get",
+      "count": 66
+    },
+    {
+      "bigram": "dem don",
+      "count": 66
+    },
+    {
+      "bigram": "dis one",
+      "count": 64
+    },
+    {
+      "bigram": "pipo dey",
+      "count": 64
+    },
+    {
+      "bigram": "and him",
+      "count": 63
+    },
+    {
+      "bigram": "and di",
+      "count": 63
+    },
+    {
+      "bigram": "di country",
+      "count": 62
+    },
+    {
+      "bigram": "for dia",
+      "count": 61
+    },
+    {
+      "bigram": "e no",
+      "count": 60
+    },
+    {
+      "bigram": "for nigeria",
+      "count": 60
+    },
+    {
+      "bigram": "him dey",
+      "count": 59
+    },
+    {
+      "bigram": "e dey",
+      "count": 58
+    },
+    {
+      "bigram": "to dey",
+      "count": 57
+    },
+    {
+      "bigram": "go dey",
+      "count": 57
+    },
+    {
+      "bigram": "na so",
+      "count": 55
+    },
+    {
+      "bigram": "well well",
+      "count": 54
+    }
+  ],
+  "trigram_freq": [
+    {
+      "trigram": "pipo wey dey",
+      "count": 53
+    },
+    {
+      "trigram": "wey be di",
+      "count": 42
+    },
+    {
+      "trigram": "say dem no",
+      "count": 38
+    },
+    {
+      "trigram": "tok say di",
+      "count": 38
+    },
+    {
+      "trigram": "say make dem",
+      "count": 38
+    },
+    {
+      "trigram": "one of di",
+      "count": 34
+    },
+    {
+      "trigram": "di pipo wey",
+      "count": 29
+    },
+    {
+      "trigram": "make sure say",
+      "count": 29
+    },
+    {
+      "trigram": "president muhammadu buhari",
+      "count": 28
+    },
+    {
+      "trigram": "tok say dem",
+      "count": 27
+    },
+    {
+      "trigram": "wey dem dey",
+      "count": 26
+    },
+    {
+      "trigram": "wey dey for",
+      "count": 25
+    },
+    {
+      "trigram": "tori be say",
+      "count": 24
+    },
+    {
+      "trigram": "hin tok say",
+      "count": 24
+    },
+    {
+      "trigram": "say him go",
+      "count": 23
+    },
+    {
+      "trigram": "don tok say",
+      "count": 23
+    },
+    {
+      "trigram": "tok say na",
+      "count": 23
+    },
+    {
+      "trigram": "for di country",
+      "count": 22
+    },
+    {
+      "trigram": "according to di",
+      "count": 22
+    },
+    {
+      "trigram": "say dem go",
+      "count": 22
+    },
+    {
+      "trigram": "as e be",
+      "count": 21
+    },
+    {
+      "trigram": "say him no",
+      "count": 21
+    },
+    {
+      "trigram": "make dem no",
+      "count": 21
+    },
+    {
+      "trigram": "tok dis one",
+      "count": 20
+    },
+    {
+      "trigram": "on top di",
+      "count": 20
+    },
+    {
+      "trigram": "tok say hin",
+      "count": 19
+    },
+    {
+      "trigram": "for di state",
+      "count": 19
+    },
+    {
+      "trigram": "some of di",
+      "count": 19
+    },
+    {
+      "trigram": "tok say make",
+      "count": 18
+    },
+    {
+      "trigram": "dem dey call",
+      "count": 18
+    }
+  ],
+  "total_texts": 4277,
+  "sample_texts": [
+    "di match wey go hold for lagos university teaching hospital wey everibodi dey call luth for lagos nigeria",
+    "na im e turn to sometin wey fit cause cancer",
+    "di pipo wey deh borrow moni don be completely down for some dey burn dia business some",
+    "but sabi pipo say dem no need wait for 18",
+    "lanre tejuosho senator representing ogun central been dey di meetin too",
+    "check weda dem qualify to get license from nhis to practise",
+    "persela coach aji santoso con tell everibodi afta match say huda no survive",
+    "wande tok say make temitope stop to dey lie to make him look bad for di only reason why hin never sue",
+    "mnangagwa con assure mugabe say hin with hin family dey safe for di country",
+    "di president tok say hin don direct security services to dey put tight security around all schools"
+  ]
+}
