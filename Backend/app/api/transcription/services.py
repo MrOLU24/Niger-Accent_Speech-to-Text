@@ -97,10 +97,7 @@ class TranscriptionService:
         print("📊 Initializing sentiment analyzer...")
         
         models_to_try = [
-            {
-                "name": "cardiffnlp/twitter-roberta-base-sentiment-latest",
-                "description": "Twitter-trained RoBERTa for social media sentiment"
-            },
+            
             {
                 "name": "nlptown/bert-base-multilingual-uncased-sentiment", 
                 "description": "Multilingual BERT for diverse language sentiment"
