@@ -21,7 +21,13 @@ async def transcribe(file: UploadFile = File(...)):
 
     # All logic handled inside the service
     doc = await service.transcribe_audio(tmp_path, file.filename)
-    return TranscriptionResponse(id=str(doc.id), text=doc.text)
+    return TranscriptionResponse(
+        id=str(doc.id), 
+        text=doc.text,
+        sentiment=doc.sentiment,
+        language_detected=doc.language_detected,
+        pidgin_confidence=doc.pidgin_confidence
+    )
 
 
 @router.get("/{transcription_id}", response_model=TranscriptionResponse)
@@ -29,7 +35,13 @@ async def get_transcription(transcription_id: str):
     doc = await service.get_transcription_by_id(transcription_id)
     if not doc:
         raise HTTPException(status_code=404, detail="Transcription not found")
-    return TranscriptionResponse(id=str(doc.id), text=doc.text)
+    return TranscriptionResponse(
+        id=str(doc.id), 
+        text=doc.text,
+        sentiment=doc.sentiment,
+        language_detected=doc.language_detected,
+        pidgin_confidence=doc.pidgin_confidence
+    )
 
 @router.post("/token")
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):

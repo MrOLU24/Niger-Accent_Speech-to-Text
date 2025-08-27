@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, Dict, Any
 from datetime import datetime
 from bson import ObjectId
 
@@ -18,6 +18,9 @@ class TranscriptionInDB(BaseModel):
     id: Optional[PyObjectId] = None
     filename: str
     text: str
+    sentiment: Optional[Dict[str, Any]] = None
+    language_detected: Optional[str] = None
+    pidgin_confidence: Optional[float] = None
     created_at: datetime = datetime.utcnow()
 
     class Config:
@@ -27,3 +30,6 @@ class TranscriptionInDB(BaseModel):
 class TranscriptionResponse(BaseModel):
     id: str
     text: str
+    sentiment: Optional[Dict[str, Any]] = None
+    language_detected: Optional[str] = None
+    pidgin_confidence: Optional[float] = None
