@@ -20,7 +20,7 @@ async def transcribe(file: UploadFile = File(...)):
         tmp_path = Path(tmp.name)
 
     # All logic handled inside the service
-    doc = await service.transcribe_audio(tmp_path, file.filename)
+    doc = await service.transcribe_audio(tmp_path, file.filename) # type: ignore
     return TranscriptionResponse(
         id=str(doc.id), 
         text=doc.text,

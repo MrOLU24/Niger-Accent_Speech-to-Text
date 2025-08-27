@@ -59,7 +59,7 @@ class TranscriptionService:
                 self.processor = WhisperProcessor.from_pretrained("openai/whisper-small", task="transcribe")
                 
                 # CRITICAL: Set proper transcription mode to prevent random languages
-                tokenizer = self.processor.tokenizer
+                tokenizer = self.processor.tokenizer # type: ignore
                 english_token_id = tokenizer.convert_tokens_to_ids("<|en|>")
                 transcribe_token_id = tokenizer.convert_tokens_to_ids("<|transcribe|>")
                 
@@ -326,18 +326,18 @@ class TranscriptionService:
                     raw_text = result["text"]
                 
                 # Process to preserve authentic Nigerian Pidgin
-                pidgin_confidence = self.pidgin_processor.get_pidgin_confidence(raw_text)
+                pidgin_confidence = self.pidgin_processor.get_pidgin_confidence(raw_text) # type: ignore
                 
                 # Determine language type
                 if pidgin_confidence > 0.3:
                     language_detected = "pidgin"
-                    text = self.pidgin_processor.process_text(raw_text, preserve_pidgin=True)
+                    text = self.pidgin_processor.process_text(raw_text, preserve_pidgin=True) # type: ignore
                 elif pidgin_confidence > 0.1:
                     language_detected = "mixed"  # Contains some Pidgin elements
-                    text = self.pidgin_processor.process_text(raw_text, preserve_pidgin=True)
+                    text = self.pidgin_processor.process_text(raw_text, preserve_pidgin=True) # type: ignore
                 else:
                     language_detected = "english"
-                    text = self.pidgin_processor.process_text(raw_text, preserve_pidgin=False)
+                    text = self.pidgin_processor.process_text(raw_text, preserve_pidgin=False) # type: ignore
                 
                 # Perform sentiment analysis on the processed text
                 print(f"🎭 Analyzing sentiment for {language_detected} text: '{text[:50]}...'")
