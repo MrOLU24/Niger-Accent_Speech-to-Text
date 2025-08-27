@@ -6,7 +6,7 @@ import tempfile
 import os
 import torch
 from transformers import WhisperProcessor, WhisperForConditionalGeneration
-from peft import PeftModel
+from peft.peft_model import PeftModel
 import librosa
 from app.api.transcription.schemas import TranscriptionInDB
 from app.core.settings import settings
@@ -52,7 +52,7 @@ class TranscriptionService:
                 base_model = WhisperForConditionalGeneration.from_pretrained("openai/whisper-small")
                 self.model = PeftModel.from_pretrained(
                     base_model, 
-                    "/Users/mubarakojewale/Documents/Ravens/Niger-Accent_Speech-to-Text/Backend/nigerian-whisper-lora-2k"
+                    "./nigerian-whisper-lora-2k"
                 )
                 # Initialize processor without forcing English language
                 self.processor = WhisperProcessor.from_pretrained("openai/whisper-small")
