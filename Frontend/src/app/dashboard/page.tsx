@@ -62,10 +62,7 @@ export default function Dashboard() {
         } else {
           setApiStatus('error');
         }
-      } catch (err) {
-        console.log('API not available, using mock mode');
-        setApiStatus('error');
-      }
+      } catch (err) { console.error(err); }
     };
     
     testAPI();
