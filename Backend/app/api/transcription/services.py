@@ -51,9 +51,16 @@ class TranscriptionService:
             try:
                 # Load your finetuned Nigerian Pidgin Whisper model (trained on whisper-small)
                 base_model = WhisperForConditionalGeneration.from_pretrained("openai/whisper-small")
+
+                adapter_dir = str(Path(__file__).resolve().parent / "nigerian-whisper-lora-2k")
+                # If still not correct, fallback to absolute path
+                if not Path(adapter_dir).exists():
+                    adapter_dir = str(Path(__file__).resolve().parents[2] / "nigerian-whisper-lora-2k")
+                    adapter_dir = r"C:\Users\pc\Desktop\Oluwashola-project\Niger-accent\Backend\nigerian-whisper-lora-2k"
+                    print(f"🔍 Attempting to load LoRA adapter from: {adapter_dir}")
                 self.model = PeftModel.from_pretrained(
-                    base_model, 
-                    "/Users/mubarakojewale/Documents/Ravens/Niger-Accent_Speech-to-Text/Backend/nigerian-whisper-lora-2k"
+                    base_model,
+                    adapter_dir
                 )
                 # Initialize processor for transcription (preserves both languages)
                 self.processor = WhisperProcessor.from_pretrained("openai/whisper-small", task="transcribe")
