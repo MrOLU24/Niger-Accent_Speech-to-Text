@@ -4,7 +4,7 @@ from app.security import create_access_token
 from pathlib import Path
 import tempfile
 from app.api.transcription.services import TranscriptionService
-from app.api.transcription.schemas import TranscriptionResponse
+from app.api.transcription.schemas import TranscriptionResponse, SentimentAnalysisRequest, SentimentAnalysisResponse
 
 router = APIRouter(prefix="/transcription", tags=["transcription"])
 
@@ -20,8 +20,14 @@ async def transcribe(file: UploadFile = File(...)):
         tmp_path = Path(tmp.name)
 
     # All logic handled inside the service
-    doc = await service.transcribe_audio(tmp_path, file.filename)
-    return TranscriptionResponse(id=str(doc.id), text=doc.text)
+    doc = await service.transcribe_audio(tmp_path, file.filename) # type: ignore
+    return TranscriptionResponse(
+        id=str(doc.id), 
+        text=doc.text,
+        sentiment=doc.sentiment,
+        language_detected=doc.language_detected,
+        pidgin_confidence=doc.pidgin_confidence
+    )
 
 
 @router.get("/{transcription_id}", response_model=TranscriptionResponse)
@@ -29,7 +35,22 @@ async def get_transcription(transcription_id: str):
     doc = await service.get_transcription_by_id(transcription_id)
     if not doc:
         raise HTTPException(status_code=404, detail="Transcription not found")
-    return TranscriptionResponse(id=str(doc.id), text=doc.text)
+    return TranscriptionResponse(
+        id=str(doc.id), 
+        text=doc.text,
+        sentiment=doc.sentiment,
+        language_detected=doc.language_detected,
+        pidgin_confidence=doc.pidgin_confidence
+    )
+
+@router.post("/sentiment", response_model=SentimentAnalysisResponse)
+async def analyze_sentiment(request: SentimentAnalysisRequest):
+    """Analyze sentiment of provided text"""
+    sentiment_result = service.analyze_sentiment(request.text)
+    return SentimentAnalysisResponse(
+        text=request.text,
+        sentiment=sentiment_result
+    )
 
 @router.post("/token")
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):

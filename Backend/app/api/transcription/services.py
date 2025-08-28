@@ -6,12 +6,13 @@ import tempfile
 import os
 import torch
 from transformers import WhisperProcessor, WhisperForConditionalGeneration
-from peft import PeftModel
+from peft.peft_model import PeftModel
 import librosa
 from app.api.transcription.schemas import TranscriptionInDB
 from app.core.settings import settings
 from app.utils.pidgin_processor import PidginProcessor
 import ffmpeg
+from transformers import pipeline
 
 
 USE_MOCK = getattr(settings, "USE_OPENAI_MOCK", False)  # Default to using Whisper
@@ -48,16 +49,30 @@ class TranscriptionService:
         # Load Whisper model (using finetuned Nigerian Pidgin model)
         if not USE_MOCK:
             try:
-                # Load your finetuned Nigerian Pidgin Whisper model
+                # Load your finetuned Nigerian Pidgin Whisper model (trained on whisper-small)
                 base_model = WhisperForConditionalGeneration.from_pretrained("openai/whisper-small")
                 self.model = PeftModel.from_pretrained(
                     base_model, 
                     "/Users/mubarakojewale/Documents/Ravens/Niger-Accent_Speech-to-Text/Backend/nigerian-whisper-lora-2k"
                 )
-                # Initialize processor without forcing English language
-                self.processor = WhisperProcessor.from_pretrained("openai/whisper-small")
-                # Remove language constraints to allow Pidgin output
-                self.model.config.forced_decoder_ids = None
+                # Initialize processor for transcription (preserves both languages)
+                self.processor = WhisperProcessor.from_pretrained("openai/whisper-small", task="transcribe")
+                
+                # CRITICAL: Set proper transcription mode to prevent random languages
+                tokenizer = self.processor.tokenizer # type: ignore
+                english_token_id = tokenizer.convert_tokens_to_ids("<|en|>")
+                transcribe_token_id = tokenizer.convert_tokens_to_ids("<|transcribe|>")
+                
+                if english_token_id and transcribe_token_id:
+                    # Force English+Transcribe to prevent French/etc output
+                    self.model.config.forced_decoder_ids = [
+                        [1, english_token_id],
+                        [2, transcribe_token_id]
+                    ]
+                    print("✅ Set English+Transcribe mode - prevents random languages")
+                else:
+                    self.model.config.forced_decoder_ids = None
+                    
                 self.model.config.suppress_tokens = []
                 print("✅ Loaded finetuned Nigerian Pidgin Whisper model")
             except Exception as e:
@@ -71,6 +86,200 @@ class TranscriptionService:
         
         # Initialize Nigerian Pidgin processor
         self.pidgin_processor = PidginProcessor()
+        
+        # Initialize sentiment analyzer with improved error handling
+        self.sentiment_analyzer = None
+        self.sentiment_model_name = None
+        self._initialize_sentiment_analyzer()
+
+    def _initialize_sentiment_analyzer(self):
+        """Initialize sentiment analyzer with fallback strategy"""
+        print("📊 Initializing sentiment analyzer...")
+        
+        models_to_try = [
+            
+            {
+                "name": "nlptown/bert-base-multilingual-uncased-sentiment", 
+                "description": "Multilingual BERT for diverse language sentiment"
+            },
+            {
+                "name": "distilbert-base-uncased-finetuned-sst-2-english",
+                "description": "Lightweight English sentiment classifier"
+            },
+            {
+                "name": "j-hartmann/emotion-english-distilroberta-base",
+                "description": "Emotion classification (can be mapped to sentiment)"
+            }
+        ]
+        
+        for model_config in models_to_try:
+            try:
+                model_name = model_config["name"]
+                description = model_config["description"]
+                print(f"   Trying: {model_name} ({description})")
+                
+                self.sentiment_analyzer = pipeline(
+                    "text-classification",
+                    model=model_name,
+                    return_all_scores=False,
+                    device=-1  # Use CPU to avoid CUDA issues
+                )
+                
+                # Test the model with a simple phrase
+                test_result = self.sentiment_analyzer("I am happy")
+                if test_result:
+                    self.sentiment_model_name = model_name
+                    print(f"✅ Successfully loaded: {model_name}")
+                    return
+                    
+            except Exception as e:
+                print(f"   ❌ Failed to load {model_config['name']}: {str(e)[:100]}...")
+                continue
+        
+        print("⚠️ Could not load any sentiment analysis model")
+        self.sentiment_analyzer = None
+        self.sentiment_model_name = None
+
+    def _preprocess_text_for_sentiment(self, text: str) -> str:
+        """Preprocess text for better sentiment analysis"""
+        if not text:
+            return ""
+            
+        # Clean and normalize text
+        text = text.strip()
+        
+        # Truncate very long texts (most models have token limits)
+        if len(text) > 512:
+            text = text[:512] + "..."
+            
+        return text
+
+    def _normalize_sentiment_result(self, result: dict, model_name: str) -> dict:
+        """Normalize different model outputs to consistent format"""
+        raw_label = result.get("label", "UNKNOWN").upper()
+        score = result.get("score", 0.0)
+        
+        # Handle different model output formats
+        if "twitter-roberta" in model_name:
+            # LABEL_0 (negative), LABEL_1 (neutral), LABEL_2 (positive)
+            if "LABEL_2" in raw_label or "POSITIVE" in raw_label:
+                sentiment = "positive"
+            elif "LABEL_0" in raw_label or "NEGATIVE" in raw_label:
+                sentiment = "negative"
+            else:
+                sentiment = "neutral"
+        elif "multilingual" in model_name:
+            # Star ratings: 1-2 stars = negative, 3 stars = neutral, 4-5 stars = positive
+            if "5 STARS" in raw_label or "4 STARS" in raw_label:
+                sentiment = "positive"
+            elif "1 STAR" in raw_label or "2 STARS" in raw_label:
+                sentiment = "negative"
+            else:
+                sentiment = "neutral"
+        elif "emotion" in model_name:
+            # Map emotions to sentiment
+            if any(emotion in raw_label for emotion in ["JOY", "LOVE", "SURPRISE"]):
+                sentiment = "positive"
+            elif any(emotion in raw_label for emotion in ["ANGER", "FEAR", "SADNESS"]):
+                sentiment = "negative"
+            else:
+                sentiment = "neutral"
+        else:
+            # Default handling for standard sentiment models
+            if "POSITIVE" in raw_label:
+                sentiment = "positive"
+            elif "NEGATIVE" in raw_label:
+                sentiment = "negative"
+            else:
+                sentiment = "neutral"
+        
+        # Determine confidence level
+        if score > 0.85:
+            confidence = "high"
+        elif score > 0.65:
+            confidence = "medium"
+        else:
+            confidence = "low"
+            
+        return {
+            "sentiment": sentiment,
+            "label": raw_label,
+            "score": round(score, 3),
+            "confidence": confidence,
+            "model_used": model_name
+        }
+
+    def analyze_sentiment(self, text: str) -> dict:
+        """
+        Analyze sentiment of text with improved error handling and preprocessing
+        
+        Args:
+            text: Text to analyze
+            
+        Returns:
+            dict: Sentiment analysis results with label, score, confidence, and model info
+        """
+        # Return default result if no analyzer or empty text
+        if not self.sentiment_analyzer or not text or not text.strip():
+            return {
+                "sentiment": "unknown",
+                "label": "UNKNOWN",
+                "score": 0.0,
+                "confidence": "low",
+                "model_used": "none",
+                "error": "No analyzer available or empty text"
+            }
+        
+        try:
+            # Preprocess text
+            processed_text = self._preprocess_text_for_sentiment(text)
+            
+            if not processed_text:
+                return {
+                    "sentiment": "unknown",
+                    "label": "UNKNOWN",
+                    "score": 0.0,
+                    "confidence": "low",
+                    "model_used": self.sentiment_model_name or "unknown",
+                    "error": "Empty text after preprocessing"
+                }
+            
+            # Run sentiment analysis
+            result = self.sentiment_analyzer(processed_text)
+            
+            # Handle different result formats
+            if isinstance(result, list) and len(result) > 0:
+                sentiment_result = result[0]
+            elif isinstance(result, dict):
+                sentiment_result = result
+            else:
+                raise ValueError(f"Unexpected result format: {type(result)}")
+            
+            # Normalize the result
+            normalized_result = self._normalize_sentiment_result(
+                sentiment_result, 
+                self.sentiment_model_name or "unknown"
+            )
+            
+            return normalized_result
+            
+        except Exception as e:
+            error_msg = f"Sentiment analysis failed: {str(e)[:100]}"
+            print(f"⚠️ {error_msg}")
+            
+            # Try to reinitialize analyzer on certain errors
+            if "CUDA" in str(e) or "memory" in str(e).lower():
+                print("   Attempting to reinitialize sentiment analyzer...")
+                self._initialize_sentiment_analyzer()
+            
+            return {
+                "sentiment": "unknown",
+                "label": "ERROR",
+                "score": 0.0,
+                "confidence": "low",
+                "model_used": self.sentiment_model_name or "unknown",
+                "error": error_msg
+            }
 
     async def transcribe_audio(self, file_path: Path, filename: str) -> TranscriptionInDB:
         from app.core.db import audio_transcripts_collection  # dynamic import
@@ -82,6 +291,15 @@ class TranscriptionService:
             # Handle mock or real Whisper transcription
             if self.model is None:
                 text = f"Mock transcription for {filename} at {datetime.now(timezone.utc).isoformat()}"
+                language_detected = "unknown"
+                pidgin_confidence = 0.0
+                sentiment_result = {
+                    "sentiment": "neutral", 
+                    "label": "NEUTRAL", 
+                    "score": 0.5, 
+                    "confidence": "low", 
+                    "model_used": "mock"
+                }
             else:
                 # Use appropriate model for transcription
                 if self.processor:  # Using finetuned HuggingFace model
@@ -108,14 +326,23 @@ class TranscriptionService:
                     raw_text = result["text"]
                 
                 # Process to preserve authentic Nigerian Pidgin
-                pidgin_confidence = self.pidgin_processor.get_pidgin_confidence(raw_text)
+                pidgin_confidence = self.pidgin_processor.get_pidgin_confidence(raw_text) # type: ignore
                 
-                # Always preserve Pidgin expressions without converting to English
-                if pidgin_confidence > 0.2:  # Lower threshold for better detection
-                    text = self.pidgin_processor.process_text(raw_text, preserve_pidgin=True)
+                # Determine language type
+                if pidgin_confidence > 0.3:
+                    language_detected = "pidgin"
+                    text = self.pidgin_processor.process_text(raw_text, preserve_pidgin=True) # type: ignore
+                elif pidgin_confidence > 0.1:
+                    language_detected = "mixed"  # Contains some Pidgin elements
+                    text = self.pidgin_processor.process_text(raw_text, preserve_pidgin=True) # type: ignore
                 else:
-                    # Still clean up the text but don't force Pidgin patterns
-                    text = self.pidgin_processor.process_text(raw_text, preserve_pidgin=False)
+                    language_detected = "english"
+                    text = self.pidgin_processor.process_text(raw_text, preserve_pidgin=False) # type: ignore
+                
+                # Perform sentiment analysis on the processed text
+                print(f"🎭 Analyzing sentiment for {language_detected} text: '{text[:50]}...'")
+                sentiment_result = self.analyze_sentiment(text)
+                print(f"✅ Sentiment: {sentiment_result.get('label', 'UNKNOWN')} ({sentiment_result.get('confidence', 'unknown')} confidence)")
         
         finally:
             # Clean up temporary files
@@ -129,8 +356,14 @@ class TranscriptionService:
             except:
                 pass
 
-        # Store in MongoDB (collection fetched dynamically)
-        doc = TranscriptionInDB(filename=filename, text=text)
+        # Store in MongoDB with sentiment analysis and language detection
+        doc = TranscriptionInDB(
+            filename=filename, 
+            text=text,
+            sentiment=sentiment_result,
+            language_detected=language_detected,
+            pidgin_confidence=round(pidgin_confidence, 3)
+        )
         result = await audio_transcripts_collection.insert_one(doc.model_dump())
         doc.id = result.inserted_id
         return doc

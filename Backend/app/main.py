@@ -15,7 +15,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="ToriType API",
-    description="Nigerian English & Pidgin Speech-to-text API",
+    description="Nigerian English & Pidgin Speech-to-text API with Sentiment Analysis",
     version="1.0.0",
     lifespan=lifespan
 )
@@ -33,7 +33,8 @@ async def home():
         </head>
         <body style="font-family: Arial, sans-serif; text-align: center; padding-top: 50px;">
             <h1>Welcome to <span style="color: #87CEEB;">ToriType</span></h1>
-            <p>Your Nigerian English & Pidgin Speech-to-text API.</p>
+            <p>Your Nigerian English & Pidgin Speech-to-text API with Sentiment Analysis.</p>
+            <p>Visit <a href="/docs">/docs</a> for API documentation.</p>
         </body>
     </html>
     """
