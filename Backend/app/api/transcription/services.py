@@ -46,45 +46,47 @@ async def convert_to_wav(file_path: Path) -> Path:
 
 class TranscriptionService:
     def __init__(self):
-        # Load Whisper model (using finetuned Nigerian Pidgin model)
         if not USE_MOCK:
             try:
-                # Load your finetuned Nigerian Pidgin Whisper model (trained on whisper-small)
+                # Load base Whisper model
                 base_model = WhisperForConditionalGeneration.from_pretrained("openai/whisper-small")
 
-                adapter_dir = str(Path(__file__).resolve().parent / "nigerian-whisper-lora-2k")
-                # If still not correct, fallback to absolute path
-                if not Path(adapter_dir).exists():
-                    adapter_dir = str(Path(__file__).resolve().parents[2] / "nigerian-whisper-lora-2k")
-                    adapter_dir = r"C:\Users\pc\Desktop\Oluwashola-project\Niger-accent\Backend\nigerian-whisper-lora-2k"
-                    print(f"🔍 Attempting to load LoRA adapter from: {adapter_dir}")
-                self.model = PeftModel.from_pretrained(
-                    base_model,
-                    adapter_dir
-                )
-                # Initialize processor for transcription (preserves both languages)
+                # Resolve adapter path dynamically
+                adapter_dir = Path(__file__).resolve().parent / "nigerian-whisper-lora-2k"
+                if not adapter_dir.exists():
+                    # fallback: look in project root
+                    adapter_dir = Path(__file__).resolve().parents[2] / "nigerian-whisper-lora-2k"
+
+                if not adapter_dir.exists():
+                    raise FileNotFoundError(f"LoRA adapter not found at {adapter_dir}")
+
+                print(f"🔍 Loading LoRA adapter from: {adapter_dir}")
+
+                # Load fine-tuned model with adapter
+                self.model = PeftModel.from_pretrained(base_model, str(adapter_dir))
                 self.processor = WhisperProcessor.from_pretrained("openai/whisper-small", task="transcribe")
-                
-                # CRITICAL: Set proper transcription mode to prevent random languages
-                tokenizer = self.processor.tokenizer # type: ignore
+
+                # Ensure English+Transcribe mode
+                tokenizer = self.processor.tokenizer
                 english_token_id = tokenizer.convert_tokens_to_ids("<|en|>")
                 transcribe_token_id = tokenizer.convert_tokens_to_ids("<|transcribe|>")
-                
+
                 if english_token_id and transcribe_token_id:
-                    # Force English+Transcribe to prevent French/etc output
                     self.model.config.forced_decoder_ids = [
                         [1, english_token_id],
                         [2, transcribe_token_id]
                     ]
-                    print("✅ Set English+Transcribe mode - prevents random languages")
+                    print("✅ English+Transcribe mode set")
                 else:
                     self.model.config.forced_decoder_ids = None
-                    
+
                 self.model.config.suppress_tokens = []
-                print("✅ Loaded finetuned Nigerian Pidgin Whisper model")
+                print("✅ Finetuned Nigerian Pidgin Whisper model loaded")
+
             except Exception as e:
                 print(f"❌ Failed to load finetuned model: {e}")
-                # Fallback to original whisper
+                print("👉 Falling back to base Whisper")
+                import whisper
                 self.model = whisper.load_model("base")
                 self.processor = None
         else:
