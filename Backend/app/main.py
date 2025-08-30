@@ -41,7 +41,7 @@ async def home():
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # change "*" to your frontend domain if known
+    allow_origins=["https://toritype.vercel.app"],  # change "*" to your frontend domain if known
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
