@@ -1,3 +1,14 @@
+---
+title: Niger Accent Whisper
+emoji: 🗣️
+colorFrom: indigo
+colorTo: blue
+sdk: python
+sdk_version: "latest"
+app_file: app.py
+pinned: false
+---
+
 # ToriType ML Inference - Hugging Face Space
 
 This folder contains a minimal FastAPI service to serve Whisper (with optional LoRA adapter) as an HTTP API on Hugging Face Spaces.
