@@ -3,21 +3,10 @@ title: Niger Accent Whisper
 emoji: 🗣️
 colorFrom: indigo
 colorTo: blue
-sdk: python
+sdk: docker
 sdk_version: "latest"
-app_file: app.py
 pinned: false
 ---
-
-# ToriType ML Inference - Hugging Face Space
-
-This folder contains a minimal FastAPI service to serve Whisper (with optional LoRA adapter) as an HTTP API on Hugging Face Spaces.
-
-## Endpoints
-- GET `/health` – health check
-- POST `/transcribe` – audio multipart upload, returns `{ text }`
-
-## Environment Variables
 - `WHISPER_BASE_MODEL` (default: `openai/whisper-small`)
 - `LORA_ADAPTER_PATH` – optional path to the LoRA adapter inside the Space repo
 
