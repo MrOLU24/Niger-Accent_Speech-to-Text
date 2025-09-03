@@ -16,10 +16,12 @@ RUN apt-get update \
 ENV HF_HOME=/data/.cache/huggingface
 ENV TRANSFORMERS_CACHE=/data/.cache/huggingface/transformers
 ENV HF_HUB_CACHE=/data/.cache/huggingface/hub
+ENV XDG_CACHE_HOME=/data/.cache
+ENV NUMBA_CACHE_DIR=/data/.cache/numba
 ENV TOKENIZERS_PARALLELISM=false
 ENV HOME=/app
 
-RUN mkdir -p /data/.cache/huggingface && chmod -R 777 /data
+RUN mkdir -p /data/.cache/huggingface /data/.cache/numba && chmod -R 777 /data
 
 # Python dependencies
 COPY requirements.txt ./

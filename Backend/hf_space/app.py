@@ -1,4 +1,9 @@
 import os
+# Ensure numba and general caches are writable on HF Spaces before heavy imports
+os.environ.setdefault("XDG_CACHE_HOME", "/data/.cache")
+os.environ.setdefault("NUMBA_CACHE_DIR", "/data/.cache/numba")
+# If caching still errors, uncomment to disable JIT entirely
+# os.environ["NUMBA_DISABLE_JIT"] = "1"
 import tempfile
 from pathlib import Path
 from fastapi import FastAPI, UploadFile, File, HTTPException
