@@ -14,14 +14,3 @@ orjson==3.11.2
 anyio==4.10.0
 starlette==0.47.2
 requests==2.32.4
-
-# ML dependencies for local Whisper
-torch==2.2.2
-transformers==4.55.0
-peft==0.17.1
-librosa==0.10.1
-ffmpeg-python==0.2.0
-openai-whisper==20231117
-accelerate==0.27.2
-safetensors==0.4.2
-datasets==2.18.0
