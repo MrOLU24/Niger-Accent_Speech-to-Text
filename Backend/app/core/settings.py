@@ -16,15 +16,12 @@ class Settings(BaseSettings):
     SECRET_KEY: str
     ALGORITHM: str
     ACCESS_TOKEN_EXPIRE_MINUTES: int
+    
+    # Remote ML services
+    ML_SERVICE_URL: str | None = None
+    SENTIMENT_SERVICE_URL: str | None = None
 
     class Config:
         env_file = ".env"  
 
 settings = Settings()
-
-class Config:
-        env_file = Path(__file__).resolve().parent.parent.parent / ".env"
-        env_file_encoding = "utf-8"
-
-settings = Settings()
-print("✅ Loaded settings from:", settings.model_dump())

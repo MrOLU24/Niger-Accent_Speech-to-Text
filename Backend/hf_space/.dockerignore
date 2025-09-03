@@ -1,0 +1,29 @@
+# Python caches and venvs
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+ml_venv/
+.env
+*.env
+*.swp
+*.swo
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# OS/editor junk
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Large artifacts not needed at build time (keep model adapter if required)
+*.ipynb_checkpoints
+**/.ipynb_checkpoints

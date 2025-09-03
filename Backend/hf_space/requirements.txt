@@ -1,0 +1,23 @@
+--extra-index-url https://download.pytorch.org/whl/cpu
+
+fastapi==0.116.1
+uvicorn==0.35.0
+
+# Core ML stack
+transformers==4.55.0
+tokenizers==0.21.4
+torch==2.2.2
+accelerate==1.10.1
+peft==0.17.1
+safetensors==0.6.2
+
+# Audio stack
+librosa==0.10.2.post1
+soundfile==0.13.1
+ffmpeg-python==0.2.0
+
+# Multipart/form uploads
+python-multipart==0.0.20
+
+# Pin NumPy and friends for compatibility
+numpy==1.23.5
