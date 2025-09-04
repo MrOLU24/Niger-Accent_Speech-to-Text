@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+// Your actual deployed backend URLs
+const API_BASE_URL = process.env.BACKEND_API_URL || 'https://toritype.onrender.com';
+
 export async function POST(request: NextRequest) {
   try {
     // Get the form data from the request
@@ -20,28 +23,65 @@ export async function POST(request: NextRequest) {
       type: audioFile.type
     });
     
-    // TODO: Replace this with actual API call to your Python backend
-    // For now, simulate processing time and return mock transcription
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    // Mock transcription response
-    const mockTranscriptions = [
-      "Wetin dey happen for Nigeria today? The economy don dey struggle, but we still dey hope say things go better. The people dem need good leadership wey go carry everybody along.",
-      "How far? This na one very important matter wey we dey discuss. The educational system for Nigeria need serious reform. We suppose get quality education for all our children dem.",
-      "My brother, the healthcare system for this country need urgent attention. Too many people dey suffer because dem no get access to proper medical care. Government suppose do something about am.",
-      "Na so e supposed be, but reality different. The infrastructure for Nigeria still dey lag behind. We need good roads, stable electricity, and clean water for everybody.",
-      "You know say technology don change everything for this world. Nigeria suppose embrace digital transformation to compete with other countries globally."
-    ];
-    
-    const randomTranscription = mockTranscriptions[Math.floor(Math.random() * mockTranscriptions.length)];
-    
-    // Return the transcription in the expected format
-    return NextResponse.json({
-      transcription: randomTranscription,
-      status: 'success',
-      processing_time: '2.1s',
-      confidence: 0.95
-    });
+    // Forward the request to your actual backend
+  try {
+      const backendFormData = new FormData();
+      backendFormData.append('file', audioFile, audioFile.name);
+      
+      console.log(`Calling backend API: ${API_BASE_URL}/transcription/transcribe`);
+      console.log('File details:', {
+        name: audioFile.name,
+        size: audioFile.size,
+        type: audioFile.type
+      });
+      
+      const response = await fetch(`${API_BASE_URL}/transcription/transcribe`, {
+        method: 'POST',
+        body: backendFormData,
+        // Don't set headers - let fetch handle multipart/form-data boundary
+      });
+      
+      console.log(`Backend response status: ${response.status}`);
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error(`Backend API error: ${response.status} - ${errorText}`);
+        throw new Error(`Backend API error: ${response.status} - ${errorText}`);
+      }
+      
+      const result = await response.json();
+      
+      // Return the transcription in the expected format
+      return NextResponse.json({
+        text: result.text,
+        transcription: result.text, // For backward compatibility
+        status: 'success',
+        language_detected: result.language_detected,
+        pidgin_confidence: result.pidgin_confidence,
+        sentiment: result.sentiment
+      });
+      
+    } catch (backendError) {
+      console.error('Backend API call failed:', backendError);
+      console.error('API Base URL:', API_BASE_URL);
+      console.error('Full URL:', `${API_BASE_URL}/transcription/transcribe`);
+      
+      // Return error response
+      const msg = backendError instanceof Error ? backendError.message : 'Unknown error';
+      const isFetchFailed = typeof msg === 'string' && msg.toLowerCase().includes('fetch failed');
+      return NextResponse.json({
+        error: isFetchFailed
+          ? 'We could not complete the transcription. Please re-record in a quiet place and speak up.'
+          : 'Transcription service temporarily unavailable. Please try again later.',
+        error_code: isFetchFailed ? 'FETCH_FAILED' : 'BACKEND_ERROR',
+        details: msg,
+        debug_info: {
+          api_base_url: API_BASE_URL,
+          endpoint: '/transcription/transcribe',
+          full_url: `${API_BASE_URL}/transcription/transcribe`
+        }
+      }, { status: 503 });
+    }
     
   } catch (error) {
     console.error('Error processing transcription:', error);
@@ -54,9 +94,40 @@ export async function POST(request: NextRequest) {
 
 // Health check endpoint
 export async function GET() {
-  return NextResponse.json({
-    status: 'healthy',
-    message: 'Transcription API is running',
-    timestamp: new Date().toISOString()
-  });
+  try {
+    // Check backend health using the root endpoint
+    const response = await fetch(`${API_BASE_URL}/`, { 
+      method: 'GET',
+      headers: {
+        'Accept': 'text/html,application/json'
+      }
+    });
+    
+    if (response.ok) {
+      return NextResponse.json({
+        status: 'healthy',
+        message: 'Transcription API is running',
+        backend_status: 'connected',
+        backend_url: API_BASE_URL,
+        timestamp: new Date().toISOString()
+      });
+    } else {
+      return NextResponse.json({
+        status: 'degraded',
+        message: 'Frontend API running, backend unavailable',
+        backend_status: 'disconnected',
+        backend_response_status: response.status,
+        timestamp: new Date().toISOString()
+      });
+    }
+  } catch (error) {
+    return NextResponse.json({
+      status: 'degraded',
+      message: 'Frontend API running, backend unreachable',
+      backend_status: 'error',
+      backend_url: API_BASE_URL,
+      error: error instanceof Error ? error.message : 'Unknown error',
+      timestamp: new Date().toISOString()
+    });
+  }
 }
