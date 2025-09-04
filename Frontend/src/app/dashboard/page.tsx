@@ -33,7 +33,7 @@ export default function Dashboard() {
   const [isProcessing, setIsProcessing] = useState(false);
   // const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const [isDragOver, setIsDragOver] = useState(false);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  // Removed sidebar logic
   const [apiStatus, setApiStatus] = useState<'idle' | 'connecting' | 'connected' | 'error'>('idle');
 
   const { theme, setTheme } = useTheme();
@@ -387,16 +387,8 @@ export default function Dashboard() {
       <header className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            {/* Left side - Menu and Logo */}
+            {/* Left side - Logo only */}
             <div className="flex items-center gap-4">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setSidebarOpen(!sidebarOpen)}
-                className="p-2"
-              >
-                <Menu className="w-5 h-5" />
-              </Button>
               <div className="font-semibold text-xl text-gray-900 dark:text-white">
                 ToriType
               </div>
@@ -445,62 +437,19 @@ export default function Dashboard() {
         </div>
       </header>
 
-      {/* Sidebar Overlay */}
-      {sidebarOpen && (
-        <div 
-          className="fixed inset-0 bg-black/20 z-40 lg:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
 
-      {/* Sidebar */}
-      <div className={`
-        fixed top-16 right-0 h-[calc(100%-4rem)] w-72 sm:w-80 bg-white dark:bg-gray-900 border-l border-gray-200 dark:border-gray-800 transform transition-transform duration-300 ease-in-out z-40
-        ${sidebarOpen ? 'translate-x-0' : 'translate-x-full'}
-     `}>
-        <div className="p-6">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Menu</h3>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setSidebarOpen(false)}
-              className="p-2"
-            >
-              ×
-            </Button>
-          </div>
-          
-          <nav className="space-y-2">
-            <a href="#" className="flex items-center gap-3 px-3 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg">
-              <History className="w-5 h-5" />
-              Transcription History
-            </a>
-            <a href="#" className="flex items-center gap-3 px-3 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg">
-              <Settings className="w-5 h-5" />
-              Settings
-            </a>
-            <button
-              onClick={handleSignOut}
-              className="flex items-center gap-3 px-3 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg w-full text-left"
-            >
-              <LogOut className="w-5 h-5" />
-              Sign Out
-            </button>
-          </nav>
-        </div>
-      </div>
 
       {/* Main Content */}
       <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8">
         <div className="space-y-8">
-          {/* Transcription Panel - Only show if there's content */}
-          {hasTranscript && (
+          {/* Transcription Panel - Show if processing or transcript available */}
+          {(isProcessing || hasTranscript) && (
             <TranscriptionPanel
               transcriptText={transcriptText || 'Welcome to ToriType. Your transcription will appear here.'}
               isEditing={isEditing}
               editableText={editableText}
               isCopied={isCopied}
+              isProcessing={isProcessing}
               onEditStart={() => {
                 setEditableText(transcriptText);
                 setIsEditing(true);
