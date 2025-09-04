@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Link from "next/link";
 import {
   Mic,
   Zap,
@@ -14,24 +15,11 @@ import {
 } from "lucide-react";
 
 export default function HeroSection() {
-  const [isRecording, setIsRecording] = useState(false);
   const [transcriptText, setTranscriptText] = useState("");
-  const [isProcessing, setIsProcessing] = useState(false);
 
   const handleRecordClick = () => {
-    setIsRecording(!isRecording);
-    if (!isRecording) {
-      setTranscriptText("");
-      // Simulate recording functionality
-      setTimeout(() => {
-        setIsRecording(false);
-        setIsProcessing(true);
-        setTimeout(() => {
-          setTranscriptText("Wetin you talk so? This thing dey work well o!");
-          setIsProcessing(false);
-        }, 1500);
-      }, 3000);
-    }
+    // Prompt user to login to experience ToriType
+    setTranscriptText("Please login to experience ToriType recording.");
   };
 
   const handleFeatureClick = (feature: string) => {
@@ -347,16 +335,7 @@ export default function HeroSection() {
               <div className="relative">
                 <div className="bg-gray-700/50 dark:bg-gray-700/50 light:bg-gray-50 rounded-xl border border-gray-600/50 dark:border-gray-600/50 light:border-gray-200 p-3 min-h-[70px] flex items-start">
                   <div className="flex-1">
-                    {isProcessing ? (
-                      <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 bg-[#0db2f3] rounded-full animate-pulse"></div>
-                        <div className="w-2 h-2 bg-[#0db2f3] rounded-full animate-pulse delay-100"></div>
-                        <div className="w-2 h-2 bg-[#0db2f3] rounded-full animate-pulse delay-200"></div>
-                        <span className="text-xs text-gray-400 dark:text-gray-400 light:text-gray-500 ml-2">
-                          Processing your Nigerian accent...
-                        </span>
-                      </div>
-                    ) : transcriptText ? (
+                    {transcriptText ? (
                       <p className="text-sm text-white dark:text-white light:text-gray-900 leading-relaxed">
                         {transcriptText}
                       </p>
@@ -387,32 +366,17 @@ export default function HeroSection() {
                   </div>
                   <button
                     onClick={handleRecordClick}
-                    disabled={isProcessing}
+                    disabled={false}
                     className={`flex items-center gap-2 font-medium px-4 py-2 rounded-lg transition-all duration-300 text-sm ${
-                      isRecording
-                        ? "bg-red-500 hover:bg-red-600 text-white animate-pulse"
-                        : isProcessing
-                        ? "bg-gray-500 text-gray-300 cursor-not-allowed"
-                        : "bg-[#0db2f3] hover:bg-[#0db2f3]/90 text-white hover:scale-105"
+                      "bg-[#0db2f3] hover:bg-[#0db2f3]/90 text-white hover:scale-105"
                     }`}
                   >
-                    {isRecording ? (
-                      <>
-                        <div className="w-2 h-2 bg-white rounded-sm"></div>
-                        <span>Stop</span>
-                      </>
-                    ) : isProcessing ? (
-                      <>
-                        <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                        <span className="hidden sm:inline">Processing</span>
-                      </>
-                    ) : (
-                      <>
-                        <Mic className="w-3 h-3" />
-                        <span>Record</span>
-                      </>
-                    )}
+                    <>
+                      <Mic className="w-3 h-3" />
+                      <span>Record</span>
+                    </>
                   </button>
+      <Link href="/login" className="ml-2 text-xs text-[#0db2f3] underline">Login to experience ToriType</Link>
                 </div>
               </div>
             </div>
