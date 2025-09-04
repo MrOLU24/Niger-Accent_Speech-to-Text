@@ -376,7 +376,6 @@ export default function HeroSection() {
                       <span>Record</span>
                     </>
                   </button>
-      <Link href="/login" className="ml-2 text-xs text-[#0db2f3] underline">Login to experience ToriType</Link>
                 </div>
               </div>
             </div>
