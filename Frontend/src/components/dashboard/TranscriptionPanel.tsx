@@ -8,6 +8,7 @@ interface TranscriptionPanelProps {
   isEditing: boolean;
   editableText: string;
   isCopied: boolean;
+  isProcessing?: boolean;
   onEditStart: () => void;
   onEditSave: () => void;
   onEditCancel: () => void;
@@ -26,6 +27,7 @@ const TranscriptionPanel: React.FC<TranscriptionPanelProps> = ({
   isEditing,
   editableText,
   isCopied,
+  isProcessing,
   onEditStart,
   onEditSave,
   onEditCancel,
@@ -133,6 +135,12 @@ const TranscriptionPanel: React.FC<TranscriptionPanelProps> = ({
             className="w-full min-h-[200px] bg-gray-700 border-gray-600 text-gray-200 resize-none focus:border-blue-500 focus:ring-blue-500"
             placeholder="Edit your transcription..."
           />
+        ) : isProcessing ? (
+          <div className="flex flex-col items-center justify-center py-12">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-400 mb-4"></div>
+            <p className="text-blue-400 text-lg font-semibold">Processing...</p>
+            <p className="text-gray-400 text-sm mt-2">Please wait while we transcribe your audio.</p>
+          </div>
         ) : (
           <div className="space-y-3">
             <div className={`p-4 rounded-xl bg-gray-700/50 border border-gray-600 ${
