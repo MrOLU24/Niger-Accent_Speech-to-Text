@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import {
   Mic,
   Zap,
@@ -196,6 +197,29 @@ export default function HeroSection() {
 
       <div className="relative z-10 flex flex-col items-center justify-center min-h-[calc(100vh-80px)] px-4 sm:px-6 lg:px-8 py-8">
         <div className="text-center max-w-6xl mx-auto w-full">
+          {/* AltSchool Hackathon attribution */}
+          <div className="mx-auto mb-4 sm:mb-6 flex items-center justify-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 backdrop-blur supports-[backdrop-filter]:bg-white/5 shadow-sm">
+            <Image
+              src="/altschool.png"
+              alt="AltSchool Africa logo"
+              width={18}
+              height={18}
+              className="rounded [image-rendering:crisp-edges]"
+              priority
+            />
+            <span className="text-xs sm:text-sm text-gray-300">
+              Built during
+              {" "}
+              <Link
+                href="https://altschoolafrica.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#0db2f3] hover:underline"
+              >
+                AltSchool Africa Hackathon
+              </Link>
+            </span>
+          </div>
           {/* Top badge with rotating border */}
           <div className="relative inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#0db2f3]/10 border border-[#0db2f3]/20 mb-6">
             {/* Rotating border animation */}

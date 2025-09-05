@@ -1,65 +1,106 @@
 
-# ToriType: Nigerian English & Pidgin Speech-to-Text Platform
+<div align="center">
 
-ToriType is an inclusive, culturally-aware speech-to-text web application designed for Nigerian English and Pidgin speakers. It combines a modern Next.js frontend with a FastAPI backend powered by a fine-tuned Whisper model, delivering accurate transcriptions for local accents and dialects.
+# ToriType — Nigerian English & Pidgin Speech‑to‑Text
 
-## Project Overview
+Professional, inclusive STT built for Nigerian voices. Fine‑tuned Whisper model, modern UX, and scalable cloud deployment.
 
-Millions of Nigerians face poor transcription quality due to accent and dialect gaps in standard speech-to-text systems. ToriType solves this by:
-- Fine-tuning Whisper on Nigerian English and Pidgin datasets
-- Supporting browser-based recording and file uploads
-- Returning authentic, uncorrected transcriptions
+[![AltSchool Africa](Frontend/public/altschool.png)](https://altschoolafrica.com/)
 
-## Features
+<sup>Built during the AltSchool Africa Hackathon.</sup>
 
-- Audio recording via browser (MediaRecorder API)
-- Audio file upload (WAV, MP3, OGG, etc.)
-- Real-time transcription using a custom-trained Whisper model
-- Accurate support for Nigerian English and Pidgin
-- Culturally-accurate output (no forced accent correction)
+</div>
 
-## Technology Stack
+## Highlights
 
-**Frontend:**
-- Next.js 14 (App Router)
-- TypeScript
-- Tailwind CSS
-- MediaRecorder API
+- Accurate transcription for Nigerian English and Pidgin (Whisper + LoRA)
+- Modern, responsive dashboard (Next.js + Tailwind)
+- Browser recording and audio upload
+- Pidgin‑aware post‑processing that preserves culture
+- Split, scalable architecture: ML on Hugging Face Spaces, API on Render
 
-**Backend & ML:**
-- FastAPI (Python)
-- Uvicorn (ASGI server)
-- Whisper (OpenAI, fine-tuned with LoRA)
-- Hugging Face transformers, datasets, accelerate
+## Architecture
+
+- Frontend: `Frontend/` (Next.js 15, React 19, Tailwind)
+- Backend API: `Backend/app/` (FastAPI, MongoDB Atlas)
+- ML Inference Service: `Backend/hf_space/` (FastAPI on Hugging Face Spaces)
+- Training scripts: `Backend/ml/scripts/`
+
+Data flow:
+1) Browser records or uploads audio
+2) Frontend calls Backend `/transcription/transcribe`
+3) Backend forwards file to Hugging Face Space `/transcribe`
+4) Result is post‑processed and stored in MongoDB
+
+## Live/Deploy Targets
+
+- ML Service: Hugging Face Space (URL set via `ML_SERVICE_URL`)
+- API: Render service (FastAPI) with CORS for the Vercel URL
+- Frontend: Vercel (or any Next.js host)
 
 ## Quick Start
 
-**Frontend:**
+Frontend
 ```bash
 cd Frontend
 npm install
 npm run dev
 ```
 
-**Backend:**
+Backend
 ```bash
 cd Backend
+python -m venv .venv
+source .venv/Scripts/activate
 pip install -r requirements.txt
-uvicorn main:app --reload
+cp .env.sample .env  # fill values
+uvicorn app.main:app --reload --port 8000
 ```
 
-## Team Roles
+Key env vars (see `Backend/.env.sample`):
+- `MONGO_URI, MONGO_DB_NAME, MONGO_COLLECTION_NAME`
+- `SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES`
+- `ML_SERVICE_URL` (HF Space base URL)
 
-- Frontend Lead: UI/UX, recording, API integration
-- Backend/ML Engineer: FastAPI, Whisper fine-tuning, deployment
-- Data Specialist: Nigerian speech data collection/preprocessing
+## API Overview
 
-## Development Timeline
+- `POST /transcription/transcribe` — form‑data `file=@audio.wav`
+- `GET /transcription/{id}` — fetch stored transcript
+- `POST /transcription/sentiment` — `{ text }`
 
-**Week 1:** Project setup, monorepo, basic UI, backend skeleton
-**Week 2:** Core features, ML fine-tuning, API integration
-**Week 3:** Real data testing, UI polish, optimization, documentation
+The Backend internally calls the Space endpoints:
+- `POST {ML_SERVICE_URL}/transcribe`
+- `POST {ML_SERVICE_URL}/sentiment`
 
-## Expected Outcome
+## Data Sources & Citations
 
-A working prototype that accurately transcribes Nigerian English and Pidgin, ready for demo and further development as an inclusive voice technology for Nigeria.
+- Whisper: Radford et al., “Robust Speech Recognition via Large‑Scale Weak Supervision,” 2022 (OpenAI Whisper)
+- Indicative Nigerian datasets used/considered for fine‑tuning and evaluation include Common Voice (en‑NG) and curated Nigerian Pidgin samples. Ensure usage complies with each dataset’s license.
+- Sentiment baseline: DistilBERT SST‑2 (Hugging Face) for optional text classification in Space.
+
+## Development Notes
+
+- Pidgin post‑processing in `Backend/app/utils/pidgin_processor.py`
+- Mongo persistence via `motor` (`app/core/db.py`)
+- Settings in `app/core/settings.py` using pydantic‑settings
+- CORS configured in `app/main.py`
+
+## Contributing
+
+1) Create a feature branch
+2) Add/modify tests or examples when changing public behavior
+3) Keep commits focused and descriptive
+4) Open a PR with screenshots for UI changes
+
+## Backend Team Guide
+
+See `Backend/BACKEND_TEAM_GUIDE.md` for:
+- Folder structure
+- Local env setup (`.env.sample` provided)
+- Fine‑tuning LoRA and exporting adapters
+- Redeploying to Hugging Face Spaces
+- Updating Render `ML_SERVICE_URL` and testing
+
+## License
+
+For hackathon evaluation only. Dataset components remain under their respective licenses. Whisper license applies to model usage.
