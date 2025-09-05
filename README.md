@@ -36,7 +36,7 @@ Data flow:
 
 - ML Service: Hugging Face Space (URL set via `ML_SERVICE_URL`)
 - API: Render service (FastAPI) with CORS for the Vercel URL
-- Frontend: Vercel (or any Next.js host)
+- Frontend: Vercel
 
 ## Quick Start
 
