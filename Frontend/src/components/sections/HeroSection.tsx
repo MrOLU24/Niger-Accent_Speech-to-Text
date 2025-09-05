@@ -1,4 +1,6 @@
 import { useState } from "react";
+import Link from "next/link";
+import Image from "next/image";
 import {
   Mic,
   Zap,
@@ -14,24 +16,11 @@ import {
 } from "lucide-react";
 
 export default function HeroSection() {
-  const [isRecording, setIsRecording] = useState(false);
   const [transcriptText, setTranscriptText] = useState("");
-  const [isProcessing, setIsProcessing] = useState(false);
 
   const handleRecordClick = () => {
-    setIsRecording(!isRecording);
-    if (!isRecording) {
-      setTranscriptText("");
-      // Simulate recording functionality
-      setTimeout(() => {
-        setIsRecording(false);
-        setIsProcessing(true);
-        setTimeout(() => {
-          setTranscriptText("Wetin you talk so? This thing dey work well o!");
-          setIsProcessing(false);
-        }, 1500);
-      }, 3000);
-    }
+    // Prompt user to login to experience ToriType
+    setTranscriptText("Please login to experience ToriType recording.");
   };
 
   const handleFeatureClick = (feature: string) => {
@@ -208,6 +197,29 @@ export default function HeroSection() {
 
       <div className="relative z-10 flex flex-col items-center justify-center min-h-[calc(100vh-80px)] px-4 sm:px-6 lg:px-8 py-8">
         <div className="text-center max-w-6xl mx-auto w-full">
+          {/* AltSchool Hackathon attribution */}
+          <div className="mx-auto mb-4 sm:mb-6 flex items-center justify-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 backdrop-blur supports-[backdrop-filter]:bg-white/5 shadow-sm">
+            <Image
+              src="/altschool.png"
+              alt="AltSchool Africa logo"
+              width={18}
+              height={18}
+              className="rounded [image-rendering:crisp-edges]"
+              priority
+            />
+            <span className="text-xs sm:text-sm text-gray-300">
+              Built during
+              {" "}
+              <Link
+                href="https://altschoolafrica.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#0db2f3] hover:underline"
+              >
+                AltSchool Africa Hackathon
+              </Link>
+            </span>
+          </div>
           {/* Top badge with rotating border */}
           <div className="relative inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#0db2f3]/10 border border-[#0db2f3]/20 mb-6">
             {/* Rotating border animation */}
@@ -347,16 +359,7 @@ export default function HeroSection() {
               <div className="relative">
                 <div className="bg-gray-700/50 dark:bg-gray-700/50 light:bg-gray-50 rounded-xl border border-gray-600/50 dark:border-gray-600/50 light:border-gray-200 p-3 min-h-[70px] flex items-start">
                   <div className="flex-1">
-                    {isProcessing ? (
-                      <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 bg-[#0db2f3] rounded-full animate-pulse"></div>
-                        <div className="w-2 h-2 bg-[#0db2f3] rounded-full animate-pulse delay-100"></div>
-                        <div className="w-2 h-2 bg-[#0db2f3] rounded-full animate-pulse delay-200"></div>
-                        <span className="text-xs text-gray-400 dark:text-gray-400 light:text-gray-500 ml-2">
-                          Processing your Nigerian accent...
-                        </span>
-                      </div>
-                    ) : transcriptText ? (
+                    {transcriptText ? (
                       <p className="text-sm text-white dark:text-white light:text-gray-900 leading-relaxed">
                         {transcriptText}
                       </p>
@@ -387,31 +390,15 @@ export default function HeroSection() {
                   </div>
                   <button
                     onClick={handleRecordClick}
-                    disabled={isProcessing}
+                    disabled={false}
                     className={`flex items-center gap-2 font-medium px-4 py-2 rounded-lg transition-all duration-300 text-sm ${
-                      isRecording
-                        ? "bg-red-500 hover:bg-red-600 text-white animate-pulse"
-                        : isProcessing
-                        ? "bg-gray-500 text-gray-300 cursor-not-allowed"
-                        : "bg-[#0db2f3] hover:bg-[#0db2f3]/90 text-white hover:scale-105"
+                      "bg-[#0db2f3] hover:bg-[#0db2f3]/90 text-white hover:scale-105"
                     }`}
                   >
-                    {isRecording ? (
-                      <>
-                        <div className="w-2 h-2 bg-white rounded-sm"></div>
-                        <span>Stop</span>
-                      </>
-                    ) : isProcessing ? (
-                      <>
-                        <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                        <span className="hidden sm:inline">Processing</span>
-                      </>
-                    ) : (
-                      <>
-                        <Mic className="w-3 h-3" />
-                        <span>Record</span>
-                      </>
-                    )}
+                    <>
+                      <Mic className="w-3 h-3" />
+                      <span>Record</span>
+                    </>
                   </button>
                 </div>
               </div>

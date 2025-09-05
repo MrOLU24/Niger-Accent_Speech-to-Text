@@ -1,35 +1,26 @@
-# Backend - FastAPI + Whisper
+# Backend — FastAPI API and Hugging Face Space
 
-This directory is for the backend team to implement the FastAPI server with fine-tuned Whisper model.
+This backend powers ToriType: a FastAPI API deployed to Render that forwards audio to a Hugging Face Space for Whisper‑LoRA inference. MongoDB Atlas stores transcripts and metadata.
 
-
-
-## Recommended Setup
+## Quick Setup
 
 ```bash
-# Create virtual environment
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-
-# Install dependencies
-pip install fastapi uvicorn transformers datasets accelerate torch
-
-# Run development server
-uvicorn app.main:app --reload
+cd Backend
+python -m venv .venv
+source .venv/Scripts/activate
+pip install -r requirements.txt
+cp .env.sample .env  # fill values
+uvicorn app.main:app --reload --port 8000
 ```
 
-## Key Components to Implement
+Key folders:
+- `app/` — API (`main.py`, routes, services, Mongo, settings)
+- `hf_space/` — ML inference FastAPI app for Hugging Face Spaces
+- `ml/scripts/` — Training/fine‑tuning helpers
 
-1. **Audio Upload Endpoint**: Handle file uploads from frontend
-2. **Recording Endpoint**: Process real-time audio streams
-3. **Whisper Model**: Fine-tune for Nigerian English & Pidgin
-4. **LoRA Training**: Efficient fine-tuning technique
-5. **Transcription API**: Return processed text to frontend
+## Start Here
 
-## Expected API Endpoints
+For team onboarding, fine‑tuning, redeploying to Spaces, and end‑to‑end testing, read:
 
-- `POST /upload` - Handle audio file uploads
-- `POST /transcribe` - Process audio and return transcription
-- `GET /health` - Health check endpoint
+→ `BACKEND_TEAM_GUIDE.md`
 
-The backend team can start implementing when ready!
