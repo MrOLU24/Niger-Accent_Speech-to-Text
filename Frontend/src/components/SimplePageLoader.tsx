@@ -1,38 +1,35 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { Mic, Loader2 } from "lucide-react";
 
 export default function SimplePageLoader() {
   const [isLoading, setIsLoading] = useState(false);
-  const router = useRouter();
+  const [mounted, setMounted] = useState(false);
+  const pathname = usePathname();
 
   useEffect(() => {
-    // Override the router.push method to show loading
-    const originalPush = router.push;
-    
-    router.push = (href: string, options?: Record<string, unknown>) => {
-      // Only show loading for different routes
-      if (href !== window.location.pathname) {
-        setIsLoading(true);
-        
-        // Hide loading after navigation completes
-        setTimeout(() => {
-          setIsLoading(false);
-        }, 1000);
-      }
-      
-      return originalPush.call(router, href, options);
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
+
+    // Handle route changes
+    const handleComplete = () => {
+      setTimeout(() => setIsLoading(false), 500);
     };
+
+    // Complete loading on pathname change
+    handleComplete();
 
     return () => {
-      // Restore original push method
-      router.push = originalPush;
+      setIsLoading(false);
     };
-  }, [router]);
+  }, [pathname, mounted]);
 
-  if (!isLoading) return null;
+  if (!mounted || !isLoading) return null;
 
   return (
     <div className="fixed inset-0 z-[9999] bg-[#0e0f16] flex items-center justify-center">
