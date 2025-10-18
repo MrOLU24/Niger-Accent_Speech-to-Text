@@ -40,6 +40,11 @@ const TranscriptionPanel: React.FC<TranscriptionPanelProps> = ({
   
   const isPlaceholder = transcriptText.includes('Welcome to ToriType');
   
+  // Calculate stats
+  const wordCount = transcriptText.trim().split(/\s+/).filter(word => word.length > 0).length;
+  const charCount = transcriptText.length;
+  const estimatedTime = Math.ceil(wordCount / 150); // Average reading speed
+  
   // Truncate text for preview
   const shouldTruncate = transcriptText.length > 200 && !showFullText;
   const displayText = shouldTruncate ? transcriptText.substring(0, 200) + '...' : transcriptText;
@@ -150,6 +155,26 @@ const TranscriptionPanel: React.FC<TranscriptionPanelProps> = ({
                 {displayText}
               </p>
             </div>
+            
+            {/* Stats Bar */}
+            {!isPlaceholder && (
+              <div className="flex items-center justify-center gap-6 text-xs text-gray-400 bg-gray-700/30 rounded-lg p-3">
+                <div className="flex items-center gap-1">
+                  <span className="font-semibold text-blue-400">{wordCount}</span>
+                  <span>words</span>
+                </div>
+                <div className="w-px h-4 bg-gray-600"></div>
+                <div className="flex items-center gap-1">
+                  <span className="font-semibold text-blue-400">{charCount}</span>
+                  <span>characters</span>
+                </div>
+                <div className="w-px h-4 bg-gray-600"></div>
+                <div className="flex items-center gap-1">
+                  <span className="font-semibold text-blue-400">~{estimatedTime}</span>
+                  <span>min read</span>
+                </div>
+              </div>
+            )}
             
             {/* Show More/Less Button */}
             {transcriptText.length > 200 && !isPlaceholder && (

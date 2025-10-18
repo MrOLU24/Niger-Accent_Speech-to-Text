@@ -4,7 +4,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { createClient } from '../../lib/supabase/client';
 import { useRouter } from 'next/navigation';
 import { User } from '@supabase/supabase-js';
-import { Menu, Mic, Upload, Square, Play, Pause, History, Settings, LogOut, User as UserIcon, Sun, Moon } from 'lucide-react';
+import { Mic, Upload, Square, Play, Pause, History, Settings, LogOut, User as UserIcon, Sun, Moon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useTheme } from 'next-themes';
 import TranscriptionPanel from '@/components/dashboard/TranscriptionPanel';
@@ -35,6 +35,8 @@ export default function Dashboard() {
   const [isDragOver, setIsDragOver] = useState(false);
   // Removed sidebar logic
   const [apiStatus, setApiStatus] = useState<'idle' | 'connecting' | 'connected' | 'error'>('idle');
+  const [recentTranscriptions, setRecentTranscriptions] = useState<Array<{id: string, text: string, timestamp: string, wordCount: number}>>([]);
+  const [showHistory, setShowHistory] = useState(false);
 
   const { theme, setTheme } = useTheme();
   const supabase = createClient();
@@ -58,6 +60,12 @@ export default function Dashboard() {
 
   useEffect(() => {
   // setMounted(true);
+    
+    // Load recent transcriptions from localStorage
+    const saved = localStorage.getItem('toritype_transcriptions');
+    if (saved) {
+      setRecentTranscriptions(JSON.parse(saved));
+    }
     
     // Check API health on mount
     const testAPI = async () => {
@@ -164,6 +172,8 @@ export default function Dashboard() {
         setTranscriptText(transcription);
         setHasTranscript(true);
         setApiStatus('connected');
+        // Save to history
+        saveToHistory(transcription);
       } else {
         throw new Error('No transcription received from API');
       }
@@ -195,7 +205,7 @@ export default function Dashboard() {
     await sendAudioToAPI(blob, true);
   };
 
-  const handleCopyText = async () => {
+  const copyToClipboard = async () => {
     try {
       await navigator.clipboard.writeText(transcriptText);
   setIsCopied(true);
@@ -203,6 +213,32 @@ export default function Dashboard() {
     } catch (error) {
       console.error('Failed to copy text:', error);
     }
+  };
+
+  const saveToHistory = (text: string) => {
+    const wordCount = text.trim().split(/\s+/).filter(word => word.length > 0).length;
+    const newTranscription = {
+      id: Date.now().toString(),
+      text: text,
+      timestamp: new Date().toISOString(),
+      wordCount: wordCount
+    };
+    
+    const updated = [newTranscription, ...recentTranscriptions].slice(0, 10); // Keep last 10
+    setRecentTranscriptions(updated);
+    localStorage.setItem('toritype_transcriptions', JSON.stringify(updated));
+  };
+
+  const loadFromHistory = (text: string) => {
+    setTranscriptText(text);
+    setEditableText(text);
+    setHasTranscript(true);
+    setShowHistory(false);
+  };
+
+  const clearHistory = () => {
+    setRecentTranscriptions([]);
+    localStorage.removeItem('toritype_transcriptions');
   };
 
   const downloadTranscript = () => {
@@ -417,9 +453,9 @@ export default function Dashboard() {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48">
-                  <DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setShowHistory(true)}>
                     <History className="w-4 h-4 mr-2" />
-                    History
+                    History ({recentTranscriptions.length})
                   </DropdownMenuItem>
                   <DropdownMenuItem>
                     <Settings className="w-4 h-4 mr-2" />
@@ -463,7 +499,7 @@ export default function Dashboard() {
                 setEditableText(transcriptText);
               }}
               onTextChange={setEditableText}
-              onCopy={handleCopyText}
+              onCopy={copyToClipboard}
               onDownload={downloadTranscript}
             />
           )}
@@ -605,6 +641,74 @@ export default function Dashboard() {
           </div>
         </div>
       </main>
+
+      {/* History Modal */}
+      {showHistory && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-2xl w-full max-h-[80vh] overflow-hidden">
+            <div className="p-6 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Recent Transcriptions</h2>
+              <button 
+                onClick={() => setShowHistory(false)}
+                className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            
+            <div className="p-6 overflow-y-auto max-h-[calc(80vh-140px)]">
+              {recentTranscriptions.length === 0 ? (
+                <div className="text-center py-12">
+                  <History className="w-16 h-16 mx-auto text-gray-400 mb-4" />
+                  <p className="text-gray-500 dark:text-gray-400">No transcriptions yet</p>
+                  <p className="text-sm text-gray-400 dark:text-gray-500 mt-2">
+                    Your recent transcriptions will appear here
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {recentTranscriptions.map((item) => (
+                    <div 
+                      key={item.id}
+                      className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors cursor-pointer"
+                      onClick={() => loadFromHistory(item.text)}
+                    >
+                      <div className="flex items-start justify-between mb-2">
+                        <span className="text-xs text-gray-500 dark:text-gray-400">
+                          {new Date(item.timestamp).toLocaleString()}
+                        </span>
+                        <span className="text-xs text-blue-600 dark:text-blue-400 font-medium">
+                          {item.wordCount} words
+                        </span>
+                      </div>
+                      <p className="text-sm text-gray-700 dark:text-gray-300 line-clamp-2">
+                        {item.text}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+            
+            {recentTranscriptions.length > 0 && (
+              <div className="p-4 border-t border-gray-200 dark:border-gray-700 flex justify-end gap-2">
+                <Button 
+                  variant="outline" 
+                  onClick={clearHistory}
+                  className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
+                >
+                  Clear All
+                </Button>
+                <Button onClick={() => setShowHistory(false)}>
+                  Close
+                </Button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
